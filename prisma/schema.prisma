@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  materials     StudyMaterial[]
+  chatSessions  ChatSession[]
+  quizAttempts  QuizAttempt[]
+  studyPlans    StudyPlan[]
+  studyProgress StudyProgress[]
+
+  @@map("users")
+}
+
+model StudyMaterial {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  fileName    String
+  fileType    String
+  fileSize    Int
+  status      String   @default("processing") // processing, ready, error
+  pageCount   Int?
+  chunkCount  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks       DocumentChunk[]
+  chatSessions ChatSession[]
+  quizzes      Quiz[]
+
+  @@map("study_materials")
+}
+
+model DocumentChunk {
+  id         String   @id @default(cuid())
+  materialId String
+  content    String
+  chunkIndex Int
+  pageNumber Int?
+  embedding  Float[]  // stored as float array for simplicity (use pgvector in production)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  material StudyMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@map("document_chunks")
+}
+
+model ChatSession {
+  id         String   @id @default(cuid())
+  userId     String
+  materialId String?
+  title      String?
+  mode       String   @default("detailed") // simple, detailed, exam_ready
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material StudyMaterial? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  messages ChatMessage[]
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // user, assistant
+  content   String
+  sources   Json?    // array of chunk references
+  createdAt DateTime @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model Quiz {
+  id         String   @id @default(cuid())
+  materialId String
+  title      String
+  difficulty String   @default("medium") // easy, medium, hard
+  questionCount Int
+  createdAt  DateTime @default(now())
+
+  material  StudyMaterial  @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  quizId        String
+  question      String
+  options       Json     // array of option strings
+  correctAnswer Int      // index into options
+  explanation   String?
+  topic         String?
+  createdAt     DateTime @default(now())
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  userId    String
+  score     Float
+  total     Int
+  timeTaken Int?     // seconds
+  createdAt DateTime @default(now())
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id          String   @id @default(cuid())
+  attemptId   String
+  questionId  String
+  selected    Int      // index of selected option
+  isCorrect   Boolean
+  createdAt   DateTime @default(now())
+
+  attempt  QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_answers")
+}
+
+model StudyPlan {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  goal        String
+  examDate    DateTime?
+  hoursPerDay Float    @default(2)
+  topics      Json     // array of topic strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks StudyTask[]
+
+  @@map("study_plans")
+}
+
+model StudyTask {
+  id          String   @id @default(cuid())
+  planId      String
+  day         Int
+  title       String
+  description String?
+  duration    Float    // hours
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  plan StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@map("study_tasks")
+}
+
+model StudyProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @db.Date
+  studyMinutes Int     @default(0)
+  topicsStudied Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("study_progress")
+}
