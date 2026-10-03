@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
   BarChart3,
   Flame,
@@ -9,11 +9,7 @@ import {
   BookOpen,
   CheckCircle2,
   AlertTriangle,
-  Clock,
   TrendingUp,
-  FolderOpen,
-  Calendar,
-  Layers,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -23,35 +19,10 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-
-interface ProgressData {
-  materialsCount: number;
-  totalChunks: number;
-  totalAttempts: number;
-  avgScore: number;
-  totalTasks: number;
-  completedTasks: number;
-  streak: number;
-  weakTopics: Array<{ topic: string; accuracy: number; total: number }>;
-  strongTopics: Array<{ topic: string; accuracy: number; total: number }>;
-  recentAttempts: Array<{
-    id: string;
-    quizTitle: string;
-    score: number;
-    total: number;
-    date: string;
-  }>;
-  recentActivities: Array<{
-    id: string;
-    type: string;
-    title: string;
-    date: string;
-  }>;
-  studyHistory: Array<{ date: string; minutes: number }>;
-}
+import { ProgressSummary } from "@/types/progress";
 
 export default function ProgressPage() {
-  const [data, setData] = useState<ProgressData | null>(null);
+  const [data, setData] = useState<ProgressSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,7 +44,6 @@ export default function ProgressPage() {
       <Sidebar />
 
       <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-6xl mx-auto w-full space-y-8">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -113,7 +83,6 @@ export default function ProgressPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Top 4 Metrics Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="glass-panel p-5 rounded-2xl border border-white/10 relative overflow-hidden group hover:border-[#ff9d42]/30 transition-all">
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
@@ -180,9 +149,7 @@ export default function ProgressPage() {
               </div>
             </div>
 
-            {/* Performance Chart & Recent Attempts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Quiz Score History Bar Chart */}
               <div className="glass-panel p-6 rounded-2xl border border-white/10">
                 <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2">
                   <TrendingUp size={18} className="text-[#4f9eff]" />
@@ -194,7 +161,7 @@ export default function ProgressPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={data.recentAttempts.map((a, i) => ({
-                          name: `Quiz ${data.recentAttempts.length - i}`,
+                          name: `Quiz ${(data.recentAttempts?.length || 0) - i}`,
                           score: a.score,
                         }))}
                         margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -235,7 +202,6 @@ export default function ProgressPage() {
                 )}
               </div>
 
-              {/* Weak vs Strong Topics */}
               <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-5">
                 <div>
                   <h3 className="font-bold text-sm text-white mb-3 flex items-center gap-2">

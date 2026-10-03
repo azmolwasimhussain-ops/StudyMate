@@ -1,21 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
-  Settings,
   Cpu,
-  Database,
   CheckCircle2,
   XCircle,
   RefreshCw,
   Terminal,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { AIHealthStatus } from "@/types/ai";
 
 export default function SettingsPage() {
-  const [health, setHealth] = useState<any>(null);
+  const [health, setHealth] = useState<AIHealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
@@ -81,7 +79,6 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
-          {/* Status Overview Card */}
           <div className="glass-panel p-6 rounded-2xl border border-white/10">
             <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-6">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
@@ -99,7 +96,6 @@ export default function SettingsPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* AI Provider Status */}
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-[#7c6fe0]/30 transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase font-semibold">
@@ -126,7 +122,6 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Database Status */}
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase font-semibold">
@@ -155,7 +150,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Test AI Inference Card */}
           <div className="glass-panel p-6 rounded-2xl border border-white/10">
             <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
               <Sparkles size={18} className="text-[#00d4aa]" />
@@ -187,7 +181,6 @@ export default function SettingsPage() {
             )}
           </div>
 
-          {/* Configuration Instructions */}
           <div className="glass-panel p-6 rounded-2xl border border-white/10">
             <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
               <Terminal size={18} className="text-amber-400" />
