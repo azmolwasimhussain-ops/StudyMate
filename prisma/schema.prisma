@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -33,7 +30,7 @@ model StudyMaterial {
   fileName    String
   fileType    String
   fileSize    Int
-  status      String   @default("processing") // processing, ready, error
+  status      String   @default("processing")
   pageCount   Int?
   chunkCount  Int?
   createdAt   DateTime @default(now())
@@ -53,7 +50,7 @@ model DocumentChunk {
   content    String
   chunkIndex Int
   pageNumber Int?
-  embedding  Float[]  // stored as float array for simplicity (use pgvector in production)
+  embedding  Float[]
   metadata   Json?
   createdAt  DateTime @default(now())
 
@@ -67,7 +64,7 @@ model ChatSession {
   userId     String
   materialId String?
   title      String?
-  mode       String   @default("detailed") // simple, detailed, exam_ready
+  mode       String   @default("detailed")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -81,9 +78,9 @@ model ChatSession {
 model ChatMessage {
   id        String   @id @default(cuid())
   sessionId String
-  role      String   // user, assistant
+  role      String
   content   String
-  sources   Json?    // array of chunk references
+  sources   Json?
   createdAt DateTime @default(now())
 
   session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -95,7 +92,7 @@ model Quiz {
   id         String   @id @default(cuid())
   materialId String
   title      String
-  difficulty String   @default("medium") // easy, medium, hard
+  difficulty String   @default("medium")
   questionCount Int
   createdAt  DateTime @default(now())
 
@@ -110,8 +107,8 @@ model QuizQuestion {
   id            String   @id @default(cuid())
   quizId        String
   question      String
-  options       Json     // array of option strings
-  correctAnswer Int      // index into options
+  options       Json
+  correctAnswer Int
   explanation   String?
   topic         String?
   createdAt     DateTime @default(now())
@@ -128,7 +125,7 @@ model QuizAttempt {
   userId    String
   score     Float
   total     Int
-  timeTaken Int?     // seconds
+  timeTaken Int?
   createdAt DateTime @default(now())
 
   quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
@@ -142,7 +139,7 @@ model QuizAnswer {
   id          String   @id @default(cuid())
   attemptId   String
   questionId  String
-  selected    Int      // index of selected option
+  selected    Int
   isCorrect   Boolean
   createdAt   DateTime @default(now())
 
@@ -159,7 +156,7 @@ model StudyPlan {
   goal        String
   examDate    DateTime?
   hoursPerDay Float    @default(2)
-  topics      Json     // array of topic strings
+  topics      Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -175,7 +172,7 @@ model StudyTask {
   day         Int
   title       String
   description String?
-  duration    Float    // hours
+  duration    Float
   completed   Boolean  @default(false)
   completedAt DateTime?
   createdAt   DateTime @default(now())
