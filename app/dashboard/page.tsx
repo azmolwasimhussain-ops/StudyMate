@@ -3,25 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
   MessageSquare,
   HelpCircle,
   Calendar,
   Sparkles,
-  BookOpen,
   ArrowRight,
   Flame,
-  CheckCircle2,
-  Clock,
   AlertTriangle,
   FolderOpen,
-  TrendingUp,
   Cpu,
-  Layers,
-  Compass,
 } from "lucide-react";
 import { getGreeting } from "@/lib/utils/helpers";
+import { ProgressSummary } from "@/types/progress";
+import { StudyMaterial } from "@/types/materials";
+import { StudyPlan } from "@/types/planner";
 
 const StudyCore = dynamic(
   () => import("@/components/3d/study-core").then((mod) => mod.StudyCore),
@@ -35,24 +32,12 @@ const StudyCore = dynamic(
   }
 );
 
-interface DashboardData {
-  materialsCount: number;
-  totalChunks: number;
-  totalAttempts: number;
-  avgScore: number;
-  totalTasks: number;
-  completedTasks: number;
-  streak: number;
-  weakTopics: Array<{ topic: string; accuracy: number }>;
-  recentActivities: Array<{ id: string; type: string; title: string; date: string }>;
-}
-
 export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [plans, setPlans] = useState<any[]>([]);
-  const [aiStatus, setAiStatus] = useState<any>(null);
+  const [data, setData] = useState<ProgressSummary | null>(null);
+  const [, setLoading] = useState(true);
+  const [materials, setMaterials] = useState<StudyMaterial[]>([]);
+  const [plans, setPlans] = useState<StudyPlan[]>([]);
+  const [aiStatus, setAiStatus] = useState<{ model?: string; provider?: string; available?: boolean } | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -90,7 +75,6 @@ export default function DashboardPage() {
       <Sidebar />
 
       <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-7xl mx-auto w-full space-y-8">
-        {/* Command Center Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -121,9 +105,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Central 3D Knowledge Core HUD */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          {/* Left 2 Cols: 3D Knowledge Sphere & Spatial Overview */}
           <div className="lg:col-span-2 glass-panel p-6 md:p-8 rounded-3xl border border-white/10 relative overflow-hidden flex flex-col justify-between min-h-[360px]">
             <div className="flex items-center justify-between z-10">
               <div>
@@ -137,12 +119,10 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            {/* Embedded 3D Canvas */}
             <div className="w-full h-[220px] md:h-[260px] my-2 relative">
               <StudyCore className="w-full h-full" />
             </div>
 
-            {/* Bottom Micro Stats */}
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/5 z-10 text-center">
               <div>
                 <div className="text-xs text-gray-400">Streak</div>
@@ -166,9 +146,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Col: Quick Actions & Weak Topic Diagnostics */}
           <div className="space-y-6 flex flex-col justify-between">
-            {/* Quick Actions Panel */}
             <div className="glass-panel p-6 rounded-3xl border border-white/10 flex-1">
               <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Sparkles size={15} className="text-[#7c6fe0]" />
@@ -222,7 +200,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Weak Topics Diagnostic */}
             <div className="glass-panel p-5 rounded-3xl border border-white/10">
               <div className="flex items-center gap-2 mb-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
                 <AlertTriangle size={15} />
@@ -251,9 +228,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 2-Column Section: Active Mission Roadmap & Document Library */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Active Mission Roadmap */}
           <div className="glass-panel p-6 rounded-3xl border border-white/10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -271,7 +246,7 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-400">
                   Target: <strong className="text-white">{plans[0].title}</strong>
                 </div>
-                {plans[0].tasks.slice(0, 3).map((task: any) => (
+                {plans[0].tasks.slice(0, 3).map((task) => (
                   <div
                     key={task.id}
                     className="p-3.5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between gap-3"
@@ -314,7 +289,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Document Library Preview */}
           <div className="glass-panel p-6 rounded-3xl border border-white/10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">

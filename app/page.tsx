@@ -8,7 +8,6 @@ import {
   ArrowRight,
   BookOpen,
   Cpu,
-  Layers,
   Shield,
   HelpCircle,
   Calendar,
@@ -16,7 +15,6 @@ import {
   Zap,
 } from "lucide-react";
 
-// Dynamic import for 3D StudyCore to ensure high performance and SSR safety
 const StudyCore = dynamic(
   () => import("@/components/3d/study-core").then((mod) => mod.StudyCore),
   {
@@ -34,11 +32,9 @@ const StudyCore = dynamic(
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-[#06060c] text-white selection:bg-[#7c6fe0]/30 overflow-x-hidden">
-      {/* Ambient Cosmic Glows */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(124,111,224,0.18),transparent_70%)] pointer-events-none -z-10" />
       <div className="fixed bottom-0 right-0 w-[600px] h-[400px] bg-[radial-gradient(circle_at_bottom_right,rgba(79,158,255,0.1),transparent_70%)] pointer-events-none -z-10" />
 
-      {/* Floating Spatial Pill Navigation */}
       <header className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
         <nav className="glass-pill px-5 py-2.5 rounded-full flex items-center gap-6 md:gap-8 max-w-fit shadow-2xl">
           <Link href="/" className="flex items-center gap-2.5">
@@ -61,15 +57,12 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero Section with Interactive 3D Study Core */}
-      <section className="relative pt-32 md:pt-40 pb-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
-        {/* Hacktoberfest Tag */}
+      <section className="relative pt-36 md:pt-44 pb-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center" style={{ scrollMarginTop: "88px" }}>
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(124,111,224,0.12)] border border-[rgba(124,111,224,0.25)] text-xs text-[#9d93f7] font-semibold tracking-wide uppercase mb-6 animate-glow">
           <Sparkles size={13} />
           <span>Hacktoberfest 2026 · Build for a Friend</span>
         </div>
 
-        {/* Cinematic Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] max-w-4xl mb-6">
           Study smarter. <br />
           <span className="gradient-text-cosmic">Not harder.</span>
@@ -80,7 +73,6 @@ export default function LandingPage() {
           interactive knowledge universe powered by open-weight AI.
         </p>
 
-        {/* Hero CTA Controls */}
         <div className="flex flex-col sm:flex-row items-center gap-3.5 mb-10 z-10">
           <Link href="/dashboard" className="btn-primary py-3.5 px-7 text-sm rounded-xl">
             <BookOpen size={17} />
@@ -94,8 +86,7 @@ export default function LandingPage() {
           </a>
         </div>
 
-        {/* Central 3D Interactive Study Core Canvas */}
-        <div id="universe" className="relative w-full max-w-4xl h-[420px] md:h-[500px] my-4 rounded-3xl glass-panel overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center">
+        <div id="universe" className="relative w-full max-w-4xl h-[420px] md:h-[500px] my-4 rounded-3xl glass-panel overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center" style={{ scrollMarginTop: "96px" }}>
           <div className="absolute top-4 left-5 text-left pointer-events-none z-10">
             <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider uppercase">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -112,8 +103,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Feature Spheres Grid */}
-      <section id="features" className="py-20 px-6 max-w-7xl mx-auto">
+      <section id="features" className="py-20 px-6 max-w-7xl mx-auto" style={{ scrollMarginTop: "96px" }}>
         <div className="text-center mb-16">
           <div className="text-xs uppercase tracking-widest text-[#7c6fe0] font-bold mb-2">Capabilities</div>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
@@ -178,8 +168,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Open AI Architecture Showcase */}
-      <section id="open-ai" className="py-20 px-6 max-w-6xl mx-auto">
+      <section id="open-ai" className="py-20 px-6 max-w-6xl mx-auto" style={{ scrollMarginTop: "96px" }}>
         <div className="glass-panel p-8 md:p-14 rounded-3xl relative overflow-hidden border border-white/10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#00d4aa]/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -196,7 +185,6 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Model Pipeline Flow */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
               { step: "01", title: "Study Material", sub: "PDF / TXT / Markdown parsed and chunked locally" },
@@ -228,7 +216,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/5 py-10 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
         <div className="flex items-center gap-2 text-gray-300">
           <Brain size={16} className="text-[#7c6fe0]" />

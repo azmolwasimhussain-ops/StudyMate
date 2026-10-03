@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import { useDropzone } from "react-dropzone";
 import Link from "next/link";
 import {
@@ -17,37 +17,18 @@ import {
   Layers,
   FileCode,
   BookOpen,
-  ArrowRight,
-  Database,
-  Cpu,
 } from "lucide-react";
-import { formatBytes, formatDate } from "@/lib/utils/helpers";
-
-interface Material {
-  id: string;
-  title: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  status: string;
-  chunkCount: number | null;
-  createdAt: string;
-  _count?: {
-    chunks: number;
-    quizzes: number;
-    chatSessions: number;
-  };
-}
+import { formatBytes } from "@/lib/utils/helpers";
+import { StudyMaterial } from "@/types/materials";
 
 export default function MaterialsPage() {
-  const [materials, setMaterials] = useState<Material[]>([]);
+  const [materials, setMaterials] = useState<StudyMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadStage, setUploadStage] = useState<string>("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Paste text modal state
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [pasteTitle, setPasteTitle] = useState("");
   const [pasteContent, setPasteContent] = useState("");
@@ -172,7 +153,6 @@ export default function MaterialsPage() {
       <Sidebar />
 
       <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-7xl mx-auto w-full space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/5">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white mb-1">
@@ -191,7 +171,6 @@ export default function MaterialsPage() {
           </button>
         </div>
 
-        {/* Feedback Alerts */}
         {uploadError && (
           <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
             <AlertCircle size={20} className="flex-shrink-0" />
@@ -205,7 +184,6 @@ export default function MaterialsPage() {
           </div>
         )}
 
-        {/* 3D Spatial Upload Zone */}
         <div
           {...getRootProps()}
           className={`glass-panel p-8 md:p-12 text-center rounded-3xl border transition-all cursor-pointer relative overflow-hidden group ${
@@ -219,7 +197,6 @@ export default function MaterialsPage() {
           <input {...getInputProps()} />
 
           <div className="flex flex-col items-center justify-center relative z-10">
-            {/* Holographic Icon Ring */}
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#7c6fe0]/25 to-[#4f9eff]/25 border border-white/15 flex items-center justify-center text-[#9d93f7] mb-4 shadow-xl group-hover:scale-105 transition-transform">
               {uploading ? (
                 <Loader2 size={30} className="animate-spin text-[#00d4aa]" />
@@ -240,7 +217,6 @@ export default function MaterialsPage() {
               Supports PDF, Plain Text, and Markdown (up to 25MB). Content is cleaned, split into chunks, and indexed for RAG retrieval.
             </p>
 
-            {/* Ingestion Pipeline Stages */}
             {uploading ? (
               <div className="flex items-center gap-2 text-xs text-gray-300 font-mono">
                 <span className="w-2 h-2 rounded-full bg-[#00d4aa] animate-ping" />
@@ -260,7 +236,6 @@ export default function MaterialsPage() {
           </div>
         </div>
 
-        {/* Uploaded Materials List */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
@@ -358,7 +333,6 @@ export default function MaterialsPage() {
           )}
         </div>
 
-        {/* Modal: Paste Notes */}
         {showPasteModal && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="glass-panel bg-[#0d0e1c] border border-white/15 rounded-3xl w-full max-w-lg p-6 shadow-2xl">
