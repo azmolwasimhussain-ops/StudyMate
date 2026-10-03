@@ -65,9 +65,6 @@
   }
 }
 
-/* =============================================
-   GLASSMORPHISM & SPATIAL SURFACES
-   ============================================= */
 .glass-panel {
   background: var(--surface-card);
   backdrop-filter: blur(24px);
@@ -89,7 +86,6 @@
               inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Spatial Pill Nav */
 .glass-pill {
   background: rgba(12, 13, 24, 0.75);
   backdrop-filter: blur(20px);
@@ -98,7 +94,6 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Holographic Glow */
 .hologram-glow {
   position: relative;
 }
@@ -113,7 +108,6 @@
   opacity: 0.7;
 }
 
-/* Cosmic Gradient Text */
 .gradient-text-cosmic {
   background: var(--gradient-cosmic);
   -webkit-background-clip: text;
@@ -121,7 +115,6 @@
   background-clip: text;
 }
 
-/* Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -201,7 +194,6 @@
   margin-bottom: 0.4rem;
 }
 
-/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -229,7 +221,6 @@
   border: 1px solid rgba(79, 158, 255, 0.3);
 }
 
-/* Progress bar */
 .progress-bar {
   width: 100%;
   height: 6px;
@@ -244,7 +235,6 @@
   transition: width 0.4s ease;
 }
 
-/* Animations */
 @keyframes pulseGlow {
   0%, 100% { opacity: 0.6; transform: scale(1); }
   50% { opacity: 0.9; transform: scale(1.03); }
@@ -272,7 +262,6 @@
 .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
 
-/* Prose for AI answers */
 .prose-studymate {
   color: var(--text-primary);
   line-height: 1.75;
