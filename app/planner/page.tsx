@@ -1,40 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
-  Calendar,
   Sparkles,
   Check,
   Plus,
   Trash2,
-  Clock,
-  BookOpen,
   Loader2,
   AlertCircle,
-  Flag,
   Target,
-  Compass,
 } from "lucide-react";
-
-interface StudyTask {
-  id: string;
-  day: number;
-  title: string;
-  description: string | null;
-  duration: number;
-  completed: boolean;
-}
-
-interface StudyPlan {
-  id: string;
-  title: string;
-  goal: string;
-  examDate: string | null;
-  hoursPerDay: number;
-  tasks: StudyTask[];
-  createdAt: string;
-}
+import { StudyPlan } from "@/types/planner";
 
 export default function PlannerPage() {
   const [plans, setPlans] = useState<StudyPlan[]>([]);
@@ -246,7 +223,6 @@ export default function PlannerPage() {
                     </div>
                   </div>
 
-                  {/* Day by Day Mission Nodes */}
                   <div className="space-y-2.5">
                     {plan.tasks.map((task) => (
                       <div
@@ -302,7 +278,6 @@ export default function PlannerPage() {
           </div>
         )}
 
-        {/* Modal: Launch Roadmap */}
         {showCreateModal && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="glass-panel bg-[#0d0e1c] border border-white/15 rounded-3xl w-full max-w-lg p-6 shadow-2xl">

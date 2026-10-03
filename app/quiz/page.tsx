@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
   HelpCircle,
   Sparkles,
@@ -13,21 +13,12 @@ import {
   AlertTriangle,
   Loader2,
   ChevronRight,
-  BookOpen,
 } from "lucide-react";
+import { QuizDifficulty, QuizQuestionItem } from "@/types/quiz";
 
 interface Material {
   id: string;
   title: string;
-}
-
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-  topic: string;
 }
 
 interface QuizResult {
@@ -44,10 +35,10 @@ function QuizContent() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>(initialMaterialId);
   const [numQuestions, setNumQuestions] = useState<number>(5);
-  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [difficulty, setDifficulty] = useState<QuizDifficulty>("medium");
 
   const [generating, setGenerating] = useState(false);
-  const [currentQuiz, setCurrentQuiz] = useState<{ id: string; questions: Question[] } | null>(null);
+  const [currentQuiz, setCurrentQuiz] = useState<{ id: string; questions: QuizQuestionItem[] } | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -116,7 +107,7 @@ function QuizContent() {
 
     const answersPayload = currentQuiz.questions.map((q) => ({
       questionId: q.id,
-      selectedOption: selectedAnswers[q.id] !== undefined ? selectedAnswers[q.id] : -1,
+      selectedOption: selectedAnswers[q.id as string] !== undefined ? selectedAnswers[q.id as string] : -1,
     }));
 
     try {
@@ -149,7 +140,7 @@ function QuizContent() {
   const activeQuestion = currentQuiz?.questions[currentQuestionIndex];
   const allAnswered =
     currentQuiz &&
-    currentQuiz.questions.every((q) => selectedAnswers[q.id] !== undefined);
+    currentQuiz.questions.every((q) => selectedAnswers[q.id as string] !== undefined);
 
   return (
     <div className="min-h-screen bg-[#06060c] text-white flex">
@@ -172,7 +163,6 @@ function QuizContent() {
           </div>
         )}
 
-        {/* Configuration Setup Form */}
         {!currentQuiz && !generating && (
           <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl">
             <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
@@ -233,7 +223,7 @@ function QuizContent() {
                     <button
                       key={d.id}
                       type="button"
-                      onClick={() => setDifficulty(d.id as any)}
+                      onClick={() => setDifficulty(d.id as QuizDifficulty)}
                       className={`py-3 px-3 rounded-xl text-xs font-semibold border text-center transition-all ${
                         difficulty === d.id
                           ? "bg-[#7c6fe0]/20 text-[#9d93f7] border-[#7c6fe0]"
@@ -259,7 +249,6 @@ function QuizContent() {
           </div>
         )}
 
-        {/* Loading Spinner during Generation */}
         {generating && (
           <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center shadow-2xl">
             <Loader2 size={38} className="text-[#4f9eff] animate-spin mx-auto mb-4" />
@@ -270,7 +259,6 @@ function QuizContent() {
           </div>
         )}
 
-        {/* Active Quiz Question Runner */}
         {currentQuiz && activeQuestion && !quizResult && (
           <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -299,14 +287,14 @@ function QuizContent() {
 
             <div className="space-y-3 mb-8">
               {activeQuestion.options.map((opt, idx) => {
-                const isSelected = selectedAnswers[activeQuestion.id] === idx;
+                const isSelected = selectedAnswers[activeQuestion.id as string] === idx;
                 const letter = String.fromCharCode(65 + idx);
 
                 return (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => handleSelectOption(activeQuestion.id, idx)}
+                    onClick={() => handleSelectOption(activeQuestion.id as string, idx)}
                     className={`w-full text-left p-4 rounded-xl border flex items-center gap-3.5 transition-all cursor-pointer ${
                       isSelected
                         ? "bg-[#7c6fe0]/20 border-[#7c6fe0] text-white shadow-lg shadow-[#7c6fe0]/15"
@@ -363,7 +351,6 @@ function QuizContent() {
           </div>
         )}
 
-        {/* Results & Diagnostics Screen */}
         {quizResult && currentQuiz && (
           <div className="space-y-6">
             <div className="glass-panel p-8 rounded-3xl border border-white/10 text-center shadow-2xl">
@@ -411,7 +398,6 @@ function QuizContent() {
               </button>
             </div>
 
-            {/* Questions Breakdown */}
             <div className="glass-panel p-6 rounded-3xl border border-white/10">
               <h3 className="font-bold text-base text-white mb-4">
                 Answer Analysis & Explanations
@@ -419,12 +405,12 @@ function QuizContent() {
 
               <div className="space-y-4">
                 {currentQuiz.questions.map((q, idx) => {
-                  const userAns = selectedAnswers[q.id];
+                  const userAns = selectedAnswers[q.id as string];
                   const isCorrect = userAns === q.correctAnswer;
 
                   return (
                     <div
-                      key={q.id}
+                      key={q.id || idx}
                       className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 text-xs"
                     >
                       <div className="flex items-start justify-between gap-3">

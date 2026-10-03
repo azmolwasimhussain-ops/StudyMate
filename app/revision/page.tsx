@@ -2,15 +2,12 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
   Sparkles,
-  BookOpen,
-  Layers,
   RotateCw,
   AlertTriangle,
   Lightbulb,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -18,23 +15,11 @@ import {
   ThumbsUp,
   ThumbsDown,
 } from "lucide-react";
+import { RevisionMaterial } from "@/types/ai";
 
 interface Material {
   id: string;
   title: string;
-}
-
-interface RevisionData {
-  summary: string;
-  keyConcepts: Array<{
-    concept: string;
-    definition: string;
-    example: string;
-  }>;
-  flashcards: Array<{ front: string; back: string }>;
-  commonMistakes: string[];
-  examTips: string[];
-  quickRevision: string;
 }
 
 function RevisionContent() {
@@ -44,7 +29,7 @@ function RevisionContent() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>(initialMaterialId);
   const [loading, setLoading] = useState(false);
-  const [revision, setRevision] = useState<RevisionData | null>(null);
+  const [revision, setRevision] = useState<RevisionMaterial | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -170,7 +155,6 @@ function RevisionContent() {
 
         {revision && !loading && (
           <div className="space-y-6">
-            {/* Nav Tabs */}
             <div className="flex bg-[#0d0e1c] p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto shadow-lg">
               {[
                 { id: "flashcards", label: "Flashcards", count: revision.flashcards.length },
@@ -192,7 +176,6 @@ function RevisionContent() {
               ))}
             </div>
 
-            {/* TAB 1: 3D Flashcard Carousel */}
             {activeTab === "flashcards" && (
               <div className="max-w-xl mx-auto space-y-4">
                 {revision.flashcards && revision.flashcards.length > 0 ? (
@@ -204,7 +187,6 @@ function RevisionContent() {
                       <span>Click to flip card</span>
                     </div>
 
-                    {/* Spatial 3D Flippable Card */}
                     <div
                       onClick={() => setIsFlipped(!isFlipped)}
                       className={`cursor-pointer min-h-[280px] p-8 rounded-3xl glass-panel border border-white/15 flex flex-col justify-between items-center text-center transition-all duration-300 shadow-2xl hover:border-[#7c6fe0] ${
@@ -227,7 +209,6 @@ function RevisionContent() {
                       </div>
                     </div>
 
-                    {/* Card Controls */}
                     <div className="flex items-center justify-between pt-2">
                       <button
                         type="button"
@@ -289,7 +270,6 @@ function RevisionContent() {
               </div>
             )}
 
-            {/* TAB 2: Key Concepts */}
             {activeTab === "concepts" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {revision.keyConcepts.map((item, idx) => (
@@ -314,7 +294,6 @@ function RevisionContent() {
               </div>
             )}
 
-            {/* TAB 3: Common Pitfalls */}
             {activeTab === "mistakes" && (
               <div className="space-y-4 max-w-3xl mx-auto">
                 <div className="glass-panel p-6 rounded-3xl border border-white/10">
@@ -355,7 +334,6 @@ function RevisionContent() {
               </div>
             )}
 
-            {/* TAB 4: Summary */}
             {activeTab === "summary" && (
               <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 max-w-3xl mx-auto space-y-4 shadow-2xl">
                 <div className="flex items-center gap-2">
