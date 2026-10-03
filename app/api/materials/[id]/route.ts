@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
+import {
+  getMaterialById,
+  deleteStudyMaterialRecord,
+} from "@/lib/db/queries/materials";
 
 export async function GET(
   req: NextRequest,
@@ -7,27 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const material = await prisma.studyMaterial.findUnique({
-      where: { id },
-      include: {
-        chunks: {
-          select: {
-            id: true,
-            chunkIndex: true,
-            content: true,
-          },
-          orderBy: { chunkIndex: "asc" },
-        },
-        quizzes: {
-          select: {
-            id: true,
-            title: true,
-            questionCount: true,
-            createdAt: true,
-          },
-        },
-      },
-    });
+    const material = await getMaterialById(id);
 
     if (!material) {
       return NextResponse.json(
@@ -51,9 +34,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.studyMaterial.delete({
-      where: { id },
-    });
+    await deleteStudyMaterialRecord(id);
 
     return NextResponse.json({ success: true, message: "Material deleted." });
   } catch (error: any) {

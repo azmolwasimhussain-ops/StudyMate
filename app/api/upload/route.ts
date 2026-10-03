@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import {
+  createStudyMaterialRecord,
+  updateStudyMaterialStatus,
+} from "@/lib/db/queries/materials";
 import { processDocument } from "@/lib/documents/processor";
+import { MAX_FILE_SIZE } from "@/lib/constants/config";
 
-export const maxDuration = 60; // 60 seconds max duration
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,8 +27,7 @@ export async function POST(req: NextRequest) {
     const fileSize = file.size;
     const fileType = file.type || "application/octet-stream";
 
-    // Validate size (max 25MB)
-    if (fileSize > 25 * 1024 * 1024) {
+    if (fileSize > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: "File exceeds 25MB limit." },
         { status: 400 }
@@ -35,23 +38,18 @@ export async function POST(req: NextRequest) {
       titleOverride?.trim() ||
       fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
 
-    // Create record in database
-    const material = await prisma.studyMaterial.create({
-      data: {
-        userId: user.id,
-        title,
-        fileName,
-        fileType,
-        fileSize,
-        status: "processing",
-      },
+    const material = await createStudyMaterialRecord({
+      userId: user.id,
+      title,
+      fileName,
+      fileType,
+      fileSize,
+      status: "processing",
     });
 
-    // Read buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Process document synchronously (chunking, cleaning, storing)
     try {
       const result = await processDocument(
         material.id,
@@ -69,10 +67,7 @@ export async function POST(req: NextRequest) {
       });
     } catch (procErr: any) {
       console.error("Document processing failed:", procErr);
-      await prisma.studyMaterial.update({
-        where: { id: material.id },
-        data: { status: "error" },
-      });
+      await updateStudyMaterialStatus(material.id, { status: "error" });
 
       return NextResponse.json(
         {

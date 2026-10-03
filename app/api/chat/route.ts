@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
-import { generateStudyAnswer } from "@/lib/ai";
-import { retrieveRelevantChunks } from "@/lib/documents/processor";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import { getMaterialById } from "@/lib/db/queries/materials";
+import {
+  getChatSessionById,
+  createChatSession,
+  saveChatMessage,
+} from "@/lib/db/queries/chat";
+import { generateStudyAnswer } from "@/lib/ai/chat";
+import { retrieveRelevantChunks } from "@/lib/rag/retrieval";
+import { ChatMode } from "@/types/chat";
 
-export const maxDuration = 120; // 2 minutes for local inference
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,11 +30,7 @@ export async function POST(req: NextRequest) {
     let sourceChunks: string[] = [];
 
     if (materialId) {
-      const material = await prisma.studyMaterial.findUnique({
-        where: { id: materialId },
-        select: { title: true },
-      });
-
+      const material = await getMaterialById(materialId);
       if (material) {
         materialTitle = material.title;
         sourceChunks = await retrieveRelevantChunks(materialId, query, 4);
@@ -36,38 +38,36 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Get or create session
-    let session = sessionId
-      ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
-      : null;
-
-    if (!session) {
-      session = await prisma.chatSession.create({
-        data: {
-          userId: user.id,
-          materialId: materialId || null,
-          title: query.slice(0, 45) + (query.length > 45 ? "..." : ""),
-          mode: mode as string,
-        },
-      });
+    let activeSessionId = sessionId;
+    if (activeSessionId) {
+      const existingSession = await getChatSessionById(activeSessionId);
+      if (!existingSession) {
+        activeSessionId = undefined;
+      }
     }
 
-    // Save user message
-    await prisma.chatMessage.create({
-      data: {
-        sessionId: session.id,
-        role: "user",
-        content: query.trim(),
-      },
+    if (!activeSessionId) {
+      const newSession = await createChatSession({
+        userId: user.id,
+        materialId: materialId || null,
+        title: query.slice(0, 45) + (query.length > 45 ? "..." : ""),
+        mode: mode as string,
+      });
+      activeSessionId = newSession.id;
+    }
+
+    await saveChatMessage({
+      sessionId: activeSessionId,
+      role: "user",
+      content: query.trim(),
     });
 
-    // Call open-weight AI model
     let aiResponse;
     try {
       aiResponse = await generateStudyAnswer({
         query: query.trim(),
         context,
-        mode: mode as "simple" | "detailed" | "exam_ready",
+        mode: mode as ChatMode,
         materialTitle: materialTitle || undefined,
       });
     } catch (aiErr: any) {
@@ -77,25 +77,22 @@ export async function POST(req: NextRequest) {
           error:
             "AI model failed to generate response. Please ensure Ollama is running (`ollama serve`). " +
             (aiErr.message || ""),
-          sessionId: session.id,
+          sessionId: activeSessionId,
         },
         { status: 503 }
       );
     }
 
-    // Save assistant message
-    const savedAssistantMessage = await prisma.chatMessage.create({
-      data: {
-        sessionId: session.id,
-        role: "assistant",
-        content: aiResponse.content,
-        sources: sourceChunks.length > 0 ? sourceChunks : undefined,
-      },
+    const savedAssistantMessage = await saveChatMessage({
+      sessionId: activeSessionId,
+      role: "assistant",
+      content: aiResponse.content,
+      sources: sourceChunks,
     });
 
     return NextResponse.json({
       success: true,
-      sessionId: session.id,
+      sessionId: activeSessionId,
       messageId: savedAssistantMessage.id,
       content: aiResponse.content,
       model: aiResponse.model,

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { generateRevisionNotes } from "@/lib/ai";
-import { getAllChunks } from "@/lib/documents/processor";
+import { getMaterialById } from "@/lib/db/queries/materials";
+import { generateRevisionNotes } from "@/lib/ai/revision";
+import { getAllChunks } from "@/lib/rag/retrieval";
+import { RAG_CONFIG } from "@/lib/constants/config";
 
 export const maxDuration = 120;
 
@@ -17,9 +18,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const material = await prisma.studyMaterial.findUnique({
-      where: { id: materialId },
-    });
+    const material = await getMaterialById(materialId);
 
     if (!material) {
       return NextResponse.json(
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const chunks = await getAllChunks(materialId, 15);
+    const chunks = await getAllChunks(materialId, RAG_CONFIG.MAX_CHUNKS_FOR_REVISION);
     if (chunks.length === 0) {
       return NextResponse.json(
         { error: "No text chunks found for this study material." },

@@ -1,33 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
-import { generateQuizQuestions } from "@/lib/ai";
-import { getAllChunks } from "@/lib/documents/processor";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import { getMaterialById } from "@/lib/db/queries/materials";
+import {
+  getQuizzesByUser,
+  createQuizWithQuestions,
+} from "@/lib/db/queries/quiz";
+import { generateQuizQuestions } from "@/lib/ai/quiz";
+import { getAllChunks } from "@/lib/rag/retrieval";
+import { QuizDifficulty, QuizQuestionType } from "@/types/quiz";
+import { RAG_CONFIG } from "@/lib/constants/config";
 
 export const maxDuration = 120;
 
 export async function GET() {
   try {
     const user = await getOrCreateDefaultUser();
-    const quizzes = await prisma.quiz.findMany({
-      where: {
-        material: {
-          userId: user.id,
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        material: {
-          select: { id: true, title: true },
-        },
-        attempts: {
-          where: { userId: user.id },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
-    });
-
+    const quizzes = await getQuizzesByUser(user.id);
     return NextResponse.json({ quizzes });
   } catch (error: any) {
     return NextResponse.json(
@@ -55,9 +43,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const material = await prisma.studyMaterial.findUnique({
-      where: { id: materialId },
-    });
+    const material = await getMaterialById(materialId);
 
     if (!material) {
       return NextResponse.json(
@@ -66,8 +52,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Retrieve material content
-    const chunks = await getAllChunks(materialId, 15);
+    const chunks = await getAllChunks(materialId, RAG_CONFIG.MAX_CHUNKS_FOR_QUIZ);
     if (chunks.length === 0) {
       return NextResponse.json(
         { error: "No study content available in this material." },
@@ -77,14 +62,13 @@ export async function POST(req: NextRequest) {
 
     const context = chunks.join("\n\n---\n\n");
 
-    // Generate questions with AI
     let generated;
     try {
       generated = await generateQuizQuestions({
         context,
         numQuestions: Math.min(Math.max(Number(numQuestions), 3), 20),
-        difficulty: difficulty as "easy" | "medium" | "hard",
-        questionType: questionType as "mcq" | "mixed",
+        difficulty: difficulty as QuizDifficulty,
+        questionType: questionType as QuizQuestionType,
       });
     } catch (aiErr: any) {
       console.error("Quiz generation AI error:", aiErr);
@@ -105,26 +89,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Save quiz and questions in database
-    const quiz = await prisma.quiz.create({
-      data: {
-        materialId: material.id,
-        title: `${material.title} Quiz (${difficulty.toUpperCase()})`,
-        difficulty,
-        questionCount: generated.questions.length,
-        questions: {
-          create: generated.questions.map((q) => ({
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            explanation: q.explanation,
-            topic: q.topic || material.title,
-          })),
-        },
-      },
-      include: {
-        questions: true,
-      },
+    const quiz = await createQuizWithQuestions({
+      materialId: material.id,
+      title: `${material.title} Quiz (${difficulty.toUpperCase()})`,
+      difficulty,
+      questionCount: generated.questions.length,
+      questions: generated.questions.map((q) => ({
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        topic: q.topic || material.title,
+      })),
     });
 
     return NextResponse.json({

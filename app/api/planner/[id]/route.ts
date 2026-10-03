@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
+import {
+  updateStudyTaskCompletion,
+  deleteStudyPlanRecord,
+} from "@/lib/db/queries/planner";
 
-// Toggle task completion
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -18,13 +20,7 @@ export async function PATCH(
       );
     }
 
-    const task = await prisma.studyTask.update({
-      where: { id: taskId },
-      data: {
-        completed: Boolean(completed),
-        completedAt: completed ? new Date() : null,
-      },
-    });
+    const task = await updateStudyTaskCompletion(taskId, Boolean(completed));
 
     return NextResponse.json({ success: true, task });
   } catch (error: any) {
@@ -35,16 +31,13 @@ export async function PATCH(
   }
 }
 
-// Delete study plan
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    await prisma.studyPlan.delete({
-      where: { id },
-    });
+    await deleteStudyPlanRecord(id);
 
     return NextResponse.json({ success: true, message: "Study plan deleted." });
   } catch (error: any) {

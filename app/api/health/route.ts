@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { checkAIAvailability } from "@/lib/ai";
 import { prisma } from "@/lib/db/prisma";
+import { DEFAULT_AI_PROVIDER, DEFAULT_AI_MODEL } from "@/lib/constants/ai";
 
 export async function GET() {
   try {
@@ -27,8 +28,8 @@ export async function GET() {
         status: "error",
         error: error.message || "Failed health check",
         available: false,
-        provider: process.env.AI_PROVIDER || "ollama",
-        model: process.env.AI_MODEL || "gemma2:2b",
+        provider: process.env.AI_PROVIDER || DEFAULT_AI_PROVIDER,
+        model: process.env.AI_MODEL || DEFAULT_AI_MODEL,
         database: "unknown",
       },
       { status: 500 }

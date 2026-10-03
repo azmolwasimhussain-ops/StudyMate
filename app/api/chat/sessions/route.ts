@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import {
+  getChatSessionById,
+  getChatSessionsByUser,
+} from "@/lib/db/queries/chat";
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,17 +12,7 @@ export async function GET(req: NextRequest) {
     const sessionId = searchParams.get("sessionId");
 
     if (sessionId) {
-      const session = await prisma.chatSession.findUnique({
-        where: { id: sessionId },
-        include: {
-          messages: {
-            orderBy: { createdAt: "asc" },
-          },
-          material: {
-            select: { id: true, title: true },
-          },
-        },
-      });
+      const session = await getChatSessionById(sessionId);
 
       if (!session) {
         return NextResponse.json(
@@ -31,20 +24,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ session });
     }
 
-    const sessions = await prisma.chatSession.findMany({
-      where: { userId: user.id },
-      orderBy: { updatedAt: "desc" },
-      take: 20,
-      include: {
-        material: {
-          select: { id: true, title: true },
-        },
-        _count: {
-          select: { messages: true },
-        },
-      },
-    });
-
+    const sessions = await getChatSessionsByUser(user.id, 20);
     return NextResponse.json({ sessions });
   } catch (error: any) {
     return NextResponse.json(

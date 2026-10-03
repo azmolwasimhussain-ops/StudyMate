@@ -1,23 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
-import { generateStudyPlan } from "@/lib/ai";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import {
+  getStudyPlansByUser,
+  createStudyPlanWithTasks,
+} from "@/lib/db/queries/planner";
+import { generateStudyPlan } from "@/lib/ai/planner";
 
 export const maxDuration = 120;
 
 export async function GET() {
   try {
     const user = await getOrCreateDefaultUser();
-    const plans = await prisma.studyPlan.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        tasks: {
-          orderBy: { day: "asc" },
-        },
-      },
-    });
-
+    const plans = await getStudyPlansByUser(user.id);
     return NextResponse.json({ plans });
   } catch (error: any) {
     return NextResponse.json(
@@ -65,30 +59,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Persist to database
-    const plan = await prisma.studyPlan.create({
-      data: {
-        userId: user.id,
-        title: aiPlan.title || `${goal} Study Schedule`,
-        goal: goal.trim(),
-        examDate: examDate ? new Date(examDate) : null,
-        hoursPerDay: Number(hoursPerDay) || 2,
-        topics: topicList,
-        tasks: {
-          create: (aiPlan.tasks || []).map((t: any) => ({
-            day: Number(t.day) || 1,
-            title: t.title || "Study Session",
-            description: t.description || null,
-            duration: Number(t.duration) || Number(hoursPerDay) || 2,
-            completed: false,
-          })),
-        },
-      },
-      include: {
-        tasks: {
-          orderBy: { day: "asc" },
-        },
-      },
+    const plan = await createStudyPlanWithTasks({
+      userId: user.id,
+      title: aiPlan.title || `${goal} Study Schedule`,
+      goal: goal.trim(),
+      examDate: examDate ? new Date(examDate) : null,
+      hoursPerDay: Number(hoursPerDay) || 2,
+      topics: topicList,
+      tasks: (aiPlan.tasks || []).map((t: any) => ({
+        day: Number(t.day) || 1,
+        title: t.title || "Study Session",
+        description: t.description || null,
+        duration: Number(t.duration) || Number(hoursPerDay) || 2,
+      })),
     });
 
     return NextResponse.json({

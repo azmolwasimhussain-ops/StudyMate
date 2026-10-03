@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import { getQuizById, saveQuizAttemptRecord } from "@/lib/db/queries/quiz";
+import { upsertStudyProgressRecord } from "@/lib/db/queries/progress";
 
 export async function POST(req: NextRequest) {
   try {
     const user = await getOrCreateDefaultUser();
     const body = await req.json();
     const { quizId, answers, timeTaken } = body;
-    // answers format: Array<{ questionId: string, selectedOption: number }>
 
     if (!quizId || !Array.isArray(answers) || answers.length === 0) {
       return NextResponse.json(
@@ -16,12 +16,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const quiz = await prisma.quiz.findUnique({
-      where: { id: quizId },
-      include: { questions: true },
-    });
+    const quiz = await getQuizById(quizId);
 
-    if (!quiz) {
+    if (!quiz || !quiz.questions) {
       return NextResponse.json(
         { error: "Quiz not found." },
         { status: 404 }
@@ -51,7 +48,7 @@ export async function POST(req: NextRequest) {
       }
 
       gradedAnswers.push({
-        questionId: q.id,
+        questionId: q.id as string,
         selected,
         isCorrect,
       });
@@ -60,53 +57,21 @@ export async function POST(req: NextRequest) {
     const total = quiz.questions.length;
     const score = Math.round((correctCount / total) * 100);
 
-    // Identify weak topics (any topic where accuracy < 60%)
     const weakTopics = Object.entries(weakTopicsMap)
       .filter(([_, stats]) => stats.incorrect / stats.total > 0.4)
       .map(([topic]) => topic);
 
-    // Create QuizAttempt record
-    const attempt = await prisma.quizAttempt.create({
-      data: {
-        quizId,
-        userId: user.id,
-        score,
-        total,
-        timeTaken: timeTaken || null,
-        answers: {
-          create: gradedAnswers.map((a) => ({
-            questionId: a.questionId,
-            selected: a.selected,
-            isCorrect: a.isCorrect,
-          })),
-        },
-      },
-      include: {
-        answers: true,
-      },
+    const attempt = await saveQuizAttemptRecord({
+      quizId,
+      userId: user.id,
+      score,
+      total,
+      timeTaken: timeTaken || null,
+      answers: gradedAnswers,
     });
 
-    // Update today's study progress
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    await prisma.studyProgress.upsert({
-      where: {
-        userId_date: {
-          userId: user.id,
-          date: today,
-        },
-      },
-      create: {
-        userId: user.id,
-        date: today,
-        studyMinutes: Math.max(Math.round((timeTaken || 120) / 60), 5),
-        topicsStudied: weakTopics,
-      },
-      update: {
-        studyMinutes: { increment: Math.max(Math.round((timeTaken || 120) / 60), 5) },
-      },
-    });
+    const studyMinutes = Math.max(Math.round((timeTaken || 120) / 60), 5);
+    await upsertStudyProgressRecord(user.id, studyMinutes, weakTopics);
 
     return NextResponse.json({
       success: true,

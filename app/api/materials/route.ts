@@ -1,25 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { getOrCreateDefaultUser } from "@/lib/db/user";
+import { getOrCreateDefaultUser } from "@/lib/db/queries/user";
+import {
+  getMaterialsByUser,
+  createStudyMaterialRecord,
+} from "@/lib/db/queries/materials";
 import { processDocument } from "@/lib/documents/processor";
 
 export async function GET() {
   try {
     const user = await getOrCreateDefaultUser();
-    const materials = await prisma.studyMaterial.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        _count: {
-          select: {
-            chunks: true,
-            quizzes: true,
-            chatSessions: true,
-          },
-        },
-      },
-    });
-
+    const materials = await getMaterialsByUser(user.id);
     return NextResponse.json({ materials });
   } catch (error: any) {
     console.error("Fetch materials error:", error);
@@ -30,7 +20,6 @@ export async function GET() {
   }
 }
 
-// Support creating material directly from pasted text or sample notes
 export async function POST(req: NextRequest) {
   try {
     const user = await getOrCreateDefaultUser();
@@ -46,15 +35,13 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(content, "utf-8");
 
-    const material = await prisma.studyMaterial.create({
-      data: {
-        userId: user.id,
-        title: title.trim(),
-        fileName: `${title.toLowerCase().replace(/[^a-z0-9]/g, "-")}.txt`,
-        fileType: "text/plain",
-        fileSize: buffer.length,
-        status: "processing",
-      },
+    const material = await createStudyMaterialRecord({
+      userId: user.id,
+      title: title.trim(),
+      fileName: `${title.toLowerCase().replace(/[^a-z0-9]/g, "-")}.txt`,
+      fileType: "text/plain",
+      fileSize: buffer.length,
+      status: "processing",
     });
 
     const result = await processDocument(
