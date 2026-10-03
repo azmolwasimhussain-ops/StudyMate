@@ -2,21 +2,15 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import {
   Send,
   Brain,
-  Sparkles,
   BookOpen,
   Layers,
-  ChevronDown,
   AlertCircle,
-  FileText,
-  Compass,
-  Cpu,
-  ShieldCheck,
-  CheckCircle2,
 } from "lucide-react";
+import { ChatMode } from "@/types/chat";
 
 interface Message {
   id: string;
@@ -40,7 +34,7 @@ function ChatContent() {
 
   const [materials, setMaterials] = useState<Material[]>([]);
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>(initialMaterialId);
-  const [mode, setMode] = useState<"simple" | "detailed" | "exam_ready">("detailed");
+  const [mode, setMode] = useState<ChatMode>("detailed");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "intro",
@@ -131,7 +125,6 @@ function ChatContent() {
       <Sidebar />
 
       <main className="flex-1 md:ml-64 flex flex-col h-screen max-w-7xl mx-auto w-full pt-16 md:pt-0">
-        {/* Session Top Bar */}
         <header className="p-4 border-b border-white/5 bg-[#0a0b16]/80 backdrop-blur-xl flex items-center justify-between gap-3 z-10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-[#7c6fe0]/20 flex items-center justify-center text-[#9d93f7]">
@@ -143,7 +136,6 @@ function ChatContent() {
             </div>
           </div>
 
-          {/* Spatial Mode Selector */}
           <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
             {(
               [
@@ -167,9 +159,7 @@ function ChatContent() {
           </div>
         </header>
 
-        {/* 3-Column Spatial Study Arena */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Left Column: Material & Knowledge Context (Desktop) */}
           <aside className="w-64 border-r border-white/5 p-4 hidden lg:flex flex-col justify-between overflow-y-auto bg-[#080914]/40">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-gray-300 uppercase tracking-wider mb-3">
@@ -214,7 +204,6 @@ function ChatContent() {
             </div>
           </aside>
 
-          {/* Center Column: Conversation Feed */}
           <div className="flex-1 flex flex-col justify-between overflow-hidden">
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
               {messages.map((msg) => (
@@ -258,7 +247,6 @@ function ChatContent() {
                       <div className="prose-studymate whitespace-pre-wrap">{msg.content}</div>
                     </div>
 
-                    {/* Expandable Source Chunks */}
                     {msg.sources && msg.sources.length > 0 && (
                       <details className="text-xs glass-panel p-2.5 rounded-xl cursor-pointer">
                         <summary className="text-gray-400 font-semibold flex items-center gap-1.5 hover:text-white select-none">
@@ -281,7 +269,6 @@ function ChatContent() {
                 </div>
               ))}
 
-              {/* AI Thinking Animation */}
               {loading && (
                 <div className="flex gap-3 max-w-md mr-auto">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7c6fe0] to-[#4f9eff] flex items-center justify-center flex-shrink-0 text-white animate-pulse">
@@ -310,7 +297,6 @@ function ChatContent() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Bar */}
             <div className="p-4 border-t border-white/5 bg-[#080914]/80 backdrop-blur-md">
               <form onSubmit={handleSend} className="flex items-center gap-2 max-w-3xl mx-auto">
                 <input
@@ -337,7 +323,6 @@ function ChatContent() {
             </div>
           </div>
 
-          {/* Right Column: Study Insights Telemetry (Desktop) */}
           <aside className="w-72 border-l border-white/5 p-5 hidden xl:flex flex-col justify-between overflow-y-auto bg-[#080914]/30">
             <div className="space-y-5">
               <div>
@@ -362,7 +347,6 @@ function ChatContent() {
                 </div>
               </div>
 
-              {/* Latest Answer Source Stats */}
               {lastAiMessage && lastAiMessage.sources && (
                 <div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
