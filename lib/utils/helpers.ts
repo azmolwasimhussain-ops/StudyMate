@@ -1,5 +1,13 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  ACCEPTED_FILE_TYPES,
+  MAX_FILE_SIZE,
+  ALLOWED_MIME_TYPES,
+  ALLOWED_EXTENSIONS,
+} from "@/lib/constants/config";
+
+export { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE } from "@/lib/constants/config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -60,25 +68,15 @@ export function parseJsonSafely<T>(json: string, fallback: T): T {
   }
 }
 
-export const ACCEPTED_FILE_TYPES = {
-  "application/pdf": [".pdf"],
-  "text/plain": [".txt"],
-  "text/markdown": [".md"],
-};
-
-export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
-
 export function validateFile(file: File): string | null {
   if (file.size > MAX_FILE_SIZE) {
     return `File too large. Maximum size is ${formatBytes(MAX_FILE_SIZE)}`;
   }
-  const allowedTypes = ["application/pdf", "text/plain", "text/markdown"];
-  const allowedExtensions = [".pdf", ".txt", ".md"];
   const extension = "." + file.name.split(".").pop()?.toLowerCase();
 
   if (
-    !allowedTypes.includes(file.type) &&
-    !allowedExtensions.includes(extension)
+    !ALLOWED_MIME_TYPES.includes(file.type) &&
+    !ALLOWED_EXTENSIONS.includes(extension)
   ) {
     return "Unsupported file type. Please upload PDF, TXT, or Markdown files.";
   }
