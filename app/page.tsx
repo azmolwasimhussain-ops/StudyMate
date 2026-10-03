@@ -1,457 +1,245 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
-  BookOpen,
   Brain,
-  Zap,
-  FileText,
-  MessageSquare,
-  ClipboardList,
-  Calendar,
-  TrendingUp,
-  ArrowRight,
-  Cpu,
-  Shield,
-  Layers,
-  ChevronRight,
-  Star,
   Sparkles,
+  ArrowRight,
+  BookOpen,
+  Cpu,
+  Layers,
+  Shield,
+  HelpCircle,
+  Calendar,
+  Compass,
+  Zap,
 } from "lucide-react";
 
-const features = [
+// Dynamic import for 3D StudyCore to ensure high performance and SSR safety
+const StudyCore = dynamic(
+  () => import("@/components/3d/study-core").then((mod) => mod.StudyCore),
   {
-    icon: MessageSquare,
-    title: "Ask Anything",
-    description:
-      "Chat with your study material in plain language. Get simple, detailed, or exam-ready answers.",
-    color: "#7c6fe0",
-  },
-  {
-    icon: ClipboardList,
-    title: "Quiz Generator",
-    description:
-      "Generate custom quizzes from your notes. Choose difficulty and number of questions.",
-    color: "#4f9eff",
-  },
-  {
-    icon: Calendar,
-    title: "Study Planner",
-    description:
-      "AI creates a day-by-day study plan based on your exam date and available hours.",
-    color: "#00d4aa",
-  },
-  {
-    icon: Zap,
-    title: "Revision Mode",
-    description:
-      "Flashcards, key concepts, and quick summaries for last-minute revision.",
-    color: "#ffc107",
-  },
-  {
-    icon: TrendingUp,
-    title: "Progress Tracking",
-    description:
-      "See your quiz scores, study streaks, and identify weak topics that need more attention.",
-    color: "#ff6b6b",
-  },
-  {
-    icon: FileText,
-    title: "Multi-Format",
-    description:
-      "Upload PDFs, TXT files, or Markdown notes. StudyMate processes them all seamlessly.",
-    color: "#a8ff78",
-  },
-];
-
-const steps = [
-  {
-    number: "01",
-    title: "Upload your material",
-    description:
-      "Drop in your lecture notes, textbook chapters, or any study material as PDF or text.",
-  },
-  {
-    number: "02",
-    title: "AI processes & indexes",
-    description:
-      "StudyMate extracts, cleans, and chunks your content for intelligent retrieval.",
-  },
-  {
-    number: "03",
-    title: "Study smarter",
-    description:
-      "Ask questions, generate quizzes, create a study plan — all powered by open-weight AI.",
-  },
-];
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[450px] flex items-center justify-center">
+        <div className="w-48 h-48 rounded-full border border-[#7c6fe0]/20 animate-pulse flex items-center justify-center">
+          <Brain size={40} className="text-[#7c6fe0]/40 animate-bounce" />
+        </div>
+      </div>
+    ),
+  }
+);
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)" }}>
-      {/* Floating Nav */}
-      <nav className="nav-float">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "var(--gradient-1)" }}
-          >
-            <Brain size={14} className="text-white" />
-          </div>
-          <span className="font-bold text-sm">StudyMate</span>
-        </div>
-        <div className="hidden md:flex items-center gap-6">
-          <a href="#how-it-works" className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            How it works
-          </a>
-          <a href="#features" className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            Features
-          </a>
-          <a href="#open-ai" className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            Open AI
-          </a>
-        </div>
-        <Link href="/dashboard" className="btn-primary" style={{ padding: "0.4rem 1rem", fontSize: "0.8rem" }}>
-          Start Studying
-        </Link>
-      </nav>
+    <div className="relative min-h-screen bg-[#06060c] text-white selection:bg-[#7c6fe0]/30 overflow-x-hidden">
+      {/* Ambient Cosmic Glows */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(124,111,224,0.18),transparent_70%)] pointer-events-none -z-10" />
+      <div className="fixed bottom-0 right-0 w-[600px] h-[400px] bg-[radial-gradient(circle_at_bottom_right,rgba(79,158,255,0.1),transparent_70%)] pointer-events-none -z-10" />
 
-      {/* Hero */}
-      <section
-        className="relative min-h-screen flex items-center justify-center text-center px-6 pt-24 pb-16"
-        style={{ background: "var(--gradient-hero)" }}
-      >
-        {/* Glow orbs */}
-        <div
-          className="hero-glow"
-          style={{ top: "-100px", right: "-100px", opacity: 0.8 }}
-        />
-        <div
-          className="hero-glow"
-          style={{
-            bottom: "-150px",
-            left: "-150px",
-            background:
-              "radial-gradient(circle, rgba(79, 158, 255, 0.1), transparent 70%)",
-          }}
-        />
+      {/* Floating Spatial Pill Navigation */}
+      <header className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+        <nav className="glass-pill px-5 py-2.5 rounded-full flex items-center gap-6 md:gap-8 max-w-fit shadow-2xl">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7c6fe0] to-[#4f9eff] flex items-center justify-center text-white shadow-lg shadow-[#7c6fe0]/30">
+              <Brain size={18} />
+            </div>
+            <span className="font-extrabold text-sm tracking-tight text-white">StudyMate</span>
+          </Link>
 
-        <div className="relative max-w-4xl mx-auto animate-fade-in">
-          <div className="chip mb-6 mx-auto" style={{ width: "fit-content" }}>
-            <Sparkles size={12} />
-            Hacktoberfest 2026 · Build for a Friend
+          <div className="hidden md:flex items-center gap-6 text-xs text-gray-300 font-medium">
+            <a href="#universe" className="hover:text-white transition-colors">Study Universe</a>
+            <a href="#features" className="hover:text-white transition-colors">Capabilities</a>
+            <a href="#open-ai" className="hover:text-white transition-colors">Open AI Core</a>
           </div>
 
-          <h1
-            className="text-5xl md:text-7xl font-extrabold leading-[1.05] mb-6"
-            style={{ letterSpacing: "-0.03em" }}
-          >
-            Study smarter.
-            <br />
-            <span className="gradient-text">Not harder.</span>
-          </h1>
+          <Link href="/dashboard" className="btn-primary text-xs py-1.5 px-4 rounded-full">
+            <span>Start Studying</span>
+            <ArrowRight size={13} />
+          </Link>
+        </nav>
+      </header>
 
-          <p
-            className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            StudyMate turns your notes and study material into an interactive AI
-            study partner. Ask questions, generate quizzes, and get a
-            personalized study plan — all powered by{" "}
-            <span style={{ color: "var(--accent)" }}>open-weight AI</span>.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/dashboard" className="btn-primary" style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}>
-              <BookOpen size={18} />
-              Start Studying Free
-              <ArrowRight size={16} />
-            </Link>
-            <a href="#how-it-works" className="btn-secondary" style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}>
-              See How It Works
-            </a>
-          </div>
-
-          {/* Social proof */}
-          <div className="flex items-center justify-center gap-6 mt-12 text-sm" style={{ color: "var(--text-muted)" }}>
-            <div className="flex items-center gap-1.5">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} size={13} fill="#ffc107" color="#ffc107" />
-                ))}
-              </div>
-              <span>Open-weight AI</span>
-            </div>
-            <div className="w-px h-4" style={{ background: "var(--border)" }} />
-            <span>🔓 No API keys needed</span>
-            <div className="w-px h-4" style={{ background: "var(--border)" }} />
-            <span>📦 Self-hostable</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Demo preview */}
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div
-            className="glass rounded-2xl overflow-hidden"
-            style={{ border: "1px solid rgba(124, 111, 224, 0.2)" }}
-          >
-            {/* Mock browser chrome */}
-            <div
-              className="flex items-center gap-2 px-4 py-3"
-              style={{ borderBottom: "1px solid var(--border)", background: "rgba(0,0,0,0.3)" }}
-            >
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              </div>
-              <div
-                className="flex-1 text-center text-xs rounded px-3 py-1 mx-4"
-                style={{ background: "rgba(255,255,255,0.05)", color: "var(--text-muted)" }}
-              >
-                studymate.app/dashboard
-              </div>
-            </div>
-            {/* Mock dashboard preview */}
-            <div className="p-6" style={{ background: "var(--surface)" }}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                {[
-                  { label: "Materials", value: "3", sub: "uploaded" },
-                  { label: "Quiz Score", value: "84%", sub: "last attempt" },
-                  { label: "Study Streak", value: "5 days", sub: "🔥 keep it up!" },
-                ].map((stat) => (
-                  <div key={stat.label} className="card card-sm">
-                    <div className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>
-                      {stat.label}
-                    </div>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
-                      {stat.sub}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="card" style={{ padding: "1rem" }}>
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(124, 111, 224, 0.2)" }}
-                  >
-                    <Brain size={16} style={{ color: "var(--accent)" }} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>
-                      StudyMate — qwen3.5:4b
-                    </div>
-                    <div className="text-sm" style={{ color: "var(--text-primary)" }}>
-                      The null space (or kernel) of a matrix A is the set of all vectors x such that Ax = 0.
-                      Think of it as the &quot;shadow&quot; that collapses to zero when transformed by A...
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      {["Definition", "Example", "Exam Tip"].map((tag) => (
-                        <span key={tag} className="badge badge-purple" style={{ fontSize: "0.65rem" }}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section id="how-it-works" className="section">
-        <div className="text-center mb-14">
-          <div className="chip mb-4 mx-auto" style={{ width: "fit-content" }}>How it works</div>
-          <h2 className="text-4xl font-bold mb-4">
-            From notes to{" "}
-            <span className="gradient-text">knowledge</span>
-          </h2>
-          <p style={{ color: "var(--text-secondary)" }}>
-            Three simple steps to transform your study material
-          </p>
+      {/* Hero Section with Interactive 3D Study Core */}
+      <section className="relative pt-32 md:pt-40 pb-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
+        {/* Hacktoberfest Tag */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(124,111,224,0.12)] border border-[rgba(124,111,224,0.25)] text-xs text-[#9d93f7] font-semibold tracking-wide uppercase mb-6 animate-glow">
+          <Sparkles size={13} />
+          <span>Hacktoberfest 2026 · Build for a Friend</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((step, i) => (
-            <div key={i} className="step-card">
-              <div className="step-number">{step.number}</div>
-              <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                {step.description}
-              </p>
-              {i < steps.length - 1 && (
-                <ChevronRight
-                  size={20}
-                  className="absolute -right-3 top-1/2 -translate-y-1/2 hidden md:block"
-                  style={{ color: "var(--text-muted)" }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* Cinematic Headline */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] max-w-4xl mb-6">
+          Study smarter. <br />
+          <span className="gradient-text-cosmic">Not harder.</span>
+        </h1>
 
-      {/* Features */}
-      <section id="features" className="section" style={{ paddingTop: 0 }}>
-        <div className="text-center mb-14">
-          <div className="chip mb-4 mx-auto" style={{ width: "fit-content" }}>Features</div>
-          <h2 className="text-4xl font-bold mb-4">
-            Everything a student{" "}
-            <span className="gradient-text">needs</span>
-          </h2>
-        </div>
+        <p className="text-base sm:text-lg md:text-xl text-[rgba(230,235,255,0.7)] max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
+          Step inside your personal AI study partner. Turn complex notes and PDFs into an
+          interactive knowledge universe powered by open-weight AI.
+        </p>
 
-        <div className="feature-grid">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="card glass-hover"
-            >
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
-                style={{ background: `${feature.color}20` }}
-              >
-                <feature.icon size={22} style={{ color: feature.color }} />
-              </div>
-              <h3 className="text-base font-bold mb-2">{feature.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Open AI section */}
-      <section id="open-ai" className="section" style={{ paddingTop: 0 }}>
-        <div
-          className="glass rounded-2xl p-8 md:p-12"
-          style={{ border: "1px solid rgba(124, 111, 224, 0.2)" }}
-        >
-          <div className="max-w-3xl">
-            <div className="chip mb-6">
-              <Cpu size={12} />
-              Open AI Approach
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Powered by{" "}
-              <span className="gradient-text">open-weight models</span>
-            </h2>
-            <p className="text-lg mb-8" style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-              StudyMate runs on open-weight AI models through Ollama — no closed APIs, no
-              subscription costs, no vendor lock-in. Your data stays where you want it.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                {
-                  icon: Shield,
-                  title: "Data Control",
-                  desc: "Run inference locally. Your study material never leaves your machine.",
-                },
-                {
-                  icon: Layers,
-                  title: "Model Flexibility",
-                  desc: "Swap models via environment variables. Use Gemma, Llama, Qwen, or any Ollama model.",
-                },
-                {
-                  icon: Zap,
-                  title: "No API Costs",
-                  desc: "Local inference means no per-token costs after setup. Study as much as you want.",
-                },
-                {
-                  icon: Cpu,
-                  title: "Self-Hostable",
-                  desc: "Deploy on your own hardware. Full control over performance and privacy.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex gap-3 p-4 rounded-xl"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)" }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(124, 111, 224, 0.2)" }}
-                  >
-                    <item.icon size={18} style={{ color: "var(--accent)" }} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold mb-1">{item.title}</div>
-                    <div className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                      {item.desc}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.3)", border: "1px solid var(--border)" }}>
-              <p className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
-                # Configure your preferred model in .env
-              </p>
-              <p className="text-sm font-mono mt-1" style={{ color: "#00d4aa" }}>
-                AI_PROVIDER=ollama<br />
-                AI_MODEL=qwen3.5:4b &nbsp;&nbsp;# or gemma3:4b, llama3, etc.<br />
-                OLLAMA_BASE_URL=http://localhost:11434
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="section text-center" style={{ paddingTop: 0 }}>
-        <div
-          className="rounded-2xl p-10 md:p-16 relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, rgba(124,111,224,0.15), rgba(79,158,255,0.1))",
-            border: "1px solid rgba(124, 111, 224, 0.25)",
-          }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Ready to study smarter?
-          </h2>
-          <p className="text-lg mb-8" style={{ color: "var(--text-secondary)" }}>
-            Upload your first document and start a conversation with your notes.
-          </p>
-          <Link href="/dashboard" className="btn-primary" style={{ fontSize: "1rem", padding: "0.875rem 2rem" }}>
-            <BookOpen size={18} />
-            Start for Free
+        {/* Hero CTA Controls */}
+        <div className="flex flex-col sm:flex-row items-center gap-3.5 mb-10 z-10">
+          <Link href="/dashboard" className="btn-primary py-3.5 px-7 text-sm rounded-xl">
+            <BookOpen size={17} />
+            <span>Enter StudyMate</span>
             <ArrowRight size={16} />
           </Link>
+
+          <a href="#universe" className="btn-secondary py-3.5 px-6 text-sm rounded-xl">
+            <Compass size={17} className="text-[#4f9eff]" />
+            <span>Explore 3D Universe</span>
+          </a>
+        </div>
+
+        {/* Central 3D Interactive Study Core Canvas */}
+        <div id="universe" className="relative w-full max-w-4xl h-[420px] md:h-[500px] my-4 rounded-3xl glass-panel overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center">
+          <div className="absolute top-4 left-5 text-left pointer-events-none z-10">
+            <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider uppercase">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>3D Knowledge Core</span>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-0.5">Move cursor to navigate knowledge orbits</p>
+          </div>
+
+          <div className="absolute bottom-4 right-5 text-right pointer-events-none z-10 hidden sm:block">
+            <span className="badge badge-purple text-[10px]">Spatial WebGL Scene</span>
+          </div>
+
+          <StudyCore className="w-full h-full" />
+        </div>
+      </section>
+
+      {/* Feature Spheres Grid */}
+      <section id="features" className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <div className="text-xs uppercase tracking-widest text-[#7c6fe0] font-bold mb-2">Capabilities</div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+            An Intelligent Learning Ecosystem
+          </h2>
+          <p className="text-sm md:text-base text-gray-400 max-w-xl mx-auto mt-3">
+            Every feature is designed to guide students from raw lecture material to true conceptual mastery.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            {
+              icon: Brain,
+              title: "Ask StudyMate",
+              desc: "Grounded RAG chat answering with simple analogies, in-depth theory, or exam-ready points.",
+              tag: "Adaptive Modes",
+              href: "/chat",
+            },
+            {
+              icon: HelpCircle,
+              title: "Quiz Arena",
+              desc: "Generate active recall questions with automated diagnostic scoring and topic error isolation.",
+              tag: "Diagnostic Evaluation",
+              href: "/quiz",
+            },
+            {
+              icon: Calendar,
+              title: "Mission Roadmap",
+              desc: "AI creates structured day-by-day study milestones with spaced repetition and checklists.",
+              tag: "Time Management",
+              href: "/planner",
+            },
+            {
+              icon: Zap,
+              title: "Revision Deck",
+              desc: "Spatial 3D flippable flashcards, high-yield definitions, and common trap warnings.",
+              tag: "Rapid Recall",
+              href: "/revision",
+            },
+          ].map((item) => (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col justify-between group cursor-pointer"
+            >
+              <div>
+                <div className="w-11 h-11 rounded-xl bg-[#7c6fe0]/15 flex items-center justify-center text-[#9d93f7] mb-4 group-hover:scale-110 transition-transform">
+                  <item.icon size={22} />
+                </div>
+                <span className="badge badge-purple text-[9px] mb-2">{item.tag}</span>
+                <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+              </div>
+
+              <div className="mt-6 flex items-center gap-1 text-xs text-[#7c6fe0] font-semibold group-hover:translate-x-1 transition-transform">
+                <span>Enter feature</span>
+                <ArrowRight size={13} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Open AI Architecture Showcase */}
+      <section id="open-ai" className="py-20 px-6 max-w-6xl mx-auto">
+        <div className="glass-panel p-8 md:p-14 rounded-3xl relative overflow-hidden border border-white/10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#00d4aa]/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="max-w-2xl mb-10">
+            <span className="badge badge-success text-[10px] mb-3">
+              <Shield size={11} /> Open-Weight AI Architecture
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
+              Your AI. <span className="gradient-text-cosmic">Your Control.</span>
+            </h2>
+            <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+              StudyMate runs on open-weight foundation models via local Ollama inference.
+              Your notes never leak to closed third-party cloud APIs, and there are zero subscription fees.
+            </p>
+          </div>
+
+          {/* Model Pipeline Flow */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { step: "01", title: "Study Material", sub: "PDF / TXT / Markdown parsed and chunked locally" },
+              { step: "02", title: "Semantic Retrieval", sub: "Sliding-window context extraction on request" },
+              { step: "03", title: "Gemma 2 / Open AI", sub: "Gemma 2B open model runs inference on device" },
+              { step: "04", title: "Grounded Synthesis", sub: "Accurate answers, quizzes & personalized plans" },
+            ].map((st) => (
+              <div key={st.step} className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-xs font-mono font-bold text-[#7c6fe0]">{st.step}</span>
+                <h4 className="text-sm font-bold text-white mt-1 mb-1">{st.title}</h4>
+                <p className="text-xs text-gray-400 leading-normal">{st.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
+            <div className="flex items-center gap-3">
+              <Cpu size={22} className="text-[#00d4aa]" />
+              <div>
+                <div className="text-xs font-bold text-white">Active Open Foundation Model</div>
+                <div className="text-xs text-gray-400 font-mono">Google Gemma 2 (`gemma2:2b`) · Local Ollama Server</div>
+              </div>
+            </div>
+
+            <Link href="/settings" className="btn-secondary text-xs py-2 px-4 rounded-xl">
+              Inspect Model Telemetry
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer
-        className="border-t px-6 py-10"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "var(--gradient-1)" }}
-            >
-              <Brain size={14} className="text-white" />
-            </div>
-            <span className="font-bold text-sm">StudyMate</span>
-          </div>
-          <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
-            Built for Hacktoberfest 2026 — &quot;Build for a Friend&quot; Challenge.
-            Powered by open-weight AI via Ollama.
-          </p>
-          <div className="flex items-center gap-4 text-xs" style={{ color: "var(--text-muted)" }}>
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/materials">Materials</Link>
-            <Link href="/chat">Chat</Link>
-          </div>
+      <footer className="border-t border-white/5 py-10 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-gray-300">
+          <Brain size={16} className="text-[#7c6fe0]" />
+          <span className="font-bold text-white">StudyMate</span>
+          <span>· Hacktoberfest 2026</span>
+        </div>
+        <p>Built for students who deserve open, private, and intelligent study companions.</p>
+        <div className="flex gap-4">
+          <Link href="/dashboard" className="hover:text-white">Dashboard</Link>
+          <Link href="/materials" className="hover:text-white">Materials</Link>
+          <Link href="/chat" className="hover:text-white">Chat</Link>
         </div>
       </footer>
     </div>

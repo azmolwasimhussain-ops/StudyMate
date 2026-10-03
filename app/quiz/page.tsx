@@ -46,7 +46,6 @@ function QuizContent() {
   const [numQuestions, setNumQuestions] = useState<number>(5);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
 
-  // State
   const [generating, setGenerating] = useState(false);
   const [currentQuiz, setCurrentQuiz] = useState<{ id: string; questions: Question[] } | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -96,14 +95,14 @@ function QuizContent() {
         questions: data.quiz.questions,
       });
     } catch (err: any) {
-      setError(err.message || "Failed to generate quiz with AI model.");
+      setError(err.message || "Failed to generate quiz with open AI model.");
     } finally {
       setGenerating(false);
     }
   };
 
   const handleSelectOption = (questionId: string, optionIndex: number) => {
-    if (quizResult) return; // Prevent change after submit
+    if (quizResult) return;
     setSelectedAnswers((prev) => ({
       ...prev,
       [questionId]: optionIndex,
@@ -127,7 +126,7 @@ function QuizContent() {
         body: JSON.stringify({
           quizId: currentQuiz.id,
           answers: answersPayload,
-          timeTaken: 180, // estimated seconds
+          timeTaken: 180,
         }),
       });
 
@@ -153,41 +152,40 @@ function QuizContent() {
     currentQuiz.questions.every((q) => selectedAnswers[q.id] !== undefined);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-[#06060c] text-white flex">
       <Sidebar />
 
-      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-4xl mx-auto w-full">
-        <div className="mb-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-4xl mx-auto w-full space-y-8">
+        <div className="pb-6 border-b border-white/5">
           <h1 className="text-2xl font-bold tracking-tight text-white mb-1">
-            Quiz Generator
+            Quiz Arena
           </h1>
           <p className="text-sm text-gray-400">
-            Generate active recall questions directly from your uploaded material.
+            Active recall environment synthesized directly from your course knowledge chunks.
           </p>
         </div>
 
         {error && (
-          <div className="p-4 mb-6 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
             <AlertTriangle size={18} />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Configuration Card (Shown when not actively in a quiz) */}
+        {/* Configuration Setup Form */}
         {!currentQuiz && !generating && (
-          <div className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl">
+            <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
               <Sparkles size={18} className="text-[#4f9eff]" />
-              Create New Quiz
+              <span>Configure Quiz Arena</span>
             </h2>
 
-            <form onSubmit={handleGenerateQuiz} className="space-y-5">
-              {/* Material Dropdown */}
+            <form onSubmit={handleGenerateQuiz} className="space-y-6">
               <div>
                 <label className="label">Source Study Material</label>
                 {materials.length === 0 ? (
                   <p className="text-xs text-amber-400">
-                    No materials uploaded yet. Please upload a PDF or note first!
+                    No documents uploaded. Please upload a PDF or note in Document Library first.
                   </p>
                 ) : (
                   <select
@@ -196,7 +194,7 @@ function QuizContent() {
                     className="input cursor-pointer"
                   >
                     {materials.map((m) => (
-                      <option key={m.id} value={m.id} className="bg-[#111118]">
+                      <option key={m.id} value={m.id} className="bg-[#0c0d1c]">
                         {m.title}
                       </option>
                     ))}
@@ -204,7 +202,6 @@ function QuizContent() {
                 )}
               </div>
 
-              {/* Number of Questions */}
               <div>
                 <label className="label">Number of Questions</label>
                 <div className="grid grid-cols-3 gap-3">
@@ -213,9 +210,9 @@ function QuizContent() {
                       key={num}
                       type="button"
                       onClick={() => setNumQuestions(num)}
-                      className={`py-2 rounded-xl text-xs font-semibold border transition-all ${
+                      className={`py-2.5 rounded-xl text-xs font-semibold border transition-all ${
                         numQuestions === num
-                          ? "bg-[#4f9eff]/15 text-[#4f9eff] border-[#4f9eff]"
+                          ? "bg-[#4f9eff]/20 text-[#4f9eff] border-[#4f9eff]"
                           : "bg-white/5 text-gray-400 border-white/10 hover:text-white"
                       }`}
                     >
@@ -225,22 +222,21 @@ function QuizContent() {
                 </div>
               </div>
 
-              {/* Difficulty */}
               <div>
-                <label className="label">Difficulty</label>
+                <label className="label">Difficulty Tier</label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: "easy", label: "Easy", desc: "Recall" },
-                    { id: "medium", label: "Medium", desc: "Conceptual" },
-                    { id: "hard", label: "Hard", desc: "Analytical" },
+                    { id: "easy", label: "Easy", desc: "Foundational Recall" },
+                    { id: "medium", label: "Medium", desc: "Application & Theory" },
+                    { id: "hard", label: "Hard", desc: "Analytical Synthesis" },
                   ].map((d) => (
                     <button
                       key={d.id}
                       type="button"
                       onClick={() => setDifficulty(d.id as any)}
-                      className={`py-2.5 px-3 rounded-xl text-xs font-semibold border text-center transition-all ${
+                      className={`py-3 px-3 rounded-xl text-xs font-semibold border text-center transition-all ${
                         difficulty === d.id
-                          ? "bg-[#7c6fe0]/15 text-[#9d93f7] border-[#7c6fe0]"
+                          ? "bg-[#7c6fe0]/20 text-[#9d93f7] border-[#7c6fe0]"
                           : "bg-white/5 text-gray-400 border-white/10 hover:text-white"
                       }`}
                     >
@@ -254,10 +250,10 @@ function QuizContent() {
               <button
                 type="submit"
                 disabled={materials.length === 0}
-                className="btn-primary w-full py-3 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 mt-4"
+                className="btn-primary w-full py-3.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 mt-4"
               >
                 <HelpCircle size={16} />
-                Generate Quiz with Open AI
+                <span>Enter Arena & Generate Questions</span>
               </button>
             </form>
           </div>
@@ -265,21 +261,20 @@ function QuizContent() {
 
         {/* Loading Spinner during Generation */}
         {generating && (
-          <div className="card p-12 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] text-center">
-            <Loader2 size={36} className="text-[#4f9eff] animate-spin mx-auto mb-4" />
-            <h3 className="font-bold text-lg text-white mb-1">Generating Quiz...</h3>
+          <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center shadow-2xl">
+            <Loader2 size={38} className="text-[#4f9eff] animate-spin mx-auto mb-4" />
+            <h3 className="font-bold text-lg text-white mb-1">Synthesizing Questions...</h3>
             <p className="text-xs text-gray-400 max-w-sm mx-auto">
-              Reading through document chunks and synthesizing questions with the open-weight model.
+              Scanning knowledge chunks with open-weight Gemma model to craft questions and distractors.
             </p>
           </div>
         )}
 
-        {/* Active Quiz Runner */}
+        {/* Active Quiz Question Runner */}
         {currentQuiz && activeQuestion && !quizResult && (
-          <div className="card p-6 md:p-8 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            {/* Header / Progress bar */}
+          <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+              <span className="text-xs text-gray-400 font-semibold tracking-wider uppercase">
                 Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}
               </span>
               <span className="badge badge-purple text-[10px]">
@@ -298,12 +293,10 @@ function QuizContent() {
               />
             </div>
 
-            {/* Question Text */}
-            <h2 className="text-lg md:text-xl font-bold text-gray-100 mb-6 leading-snug">
+            <h2 className="text-lg md:text-xl font-bold text-white mb-6 leading-snug">
               {activeQuestion.question}
             </h2>
 
-            {/* Options */}
             <div className="space-y-3 mb-8">
               {activeQuestion.options.map((opt, idx) => {
                 const isSelected = selectedAnswers[activeQuestion.id] === idx;
@@ -314,9 +307,9 @@ function QuizContent() {
                     key={idx}
                     type="button"
                     onClick={() => handleSelectOption(activeQuestion.id, idx)}
-                    className={`w-full text-left p-4 rounded-xl border flex items-center gap-3 transition-all cursor-pointer ${
+                    className={`w-full text-left p-4 rounded-xl border flex items-center gap-3.5 transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-[#7c6fe0]/15 border-[#7c6fe0] text-white"
+                        ? "bg-[#7c6fe0]/20 border-[#7c6fe0] text-white shadow-lg shadow-[#7c6fe0]/15"
                         : "bg-white/5 border-white/10 text-gray-300 hover:border-white/20 hover:bg-white/10"
                     }`}
                   >
@@ -335,8 +328,7 @@ function QuizContent() {
               })}
             </div>
 
-            {/* Footer Navigation */}
-            <div className="flex items-center justify-between pt-4 border-t border-[rgba(255,255,255,0.08)]">
+            <div className="flex items-center justify-between pt-4 border-t border-white/5">
               <button
                 type="button"
                 disabled={currentQuestionIndex === 0}
@@ -363,7 +355,7 @@ function QuizContent() {
                     onClick={handleSubmitQuiz}
                     className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-500"
                   >
-                    {submitting ? "Grading..." : "Submit Quiz"}
+                    {submitting ? "Grading..." : "Submit Answers"}
                   </button>
                 )}
               </div>
@@ -371,19 +363,18 @@ function QuizContent() {
           </div>
         )}
 
-        {/* Results Screen */}
+        {/* Results & Diagnostics Screen */}
         {quizResult && currentQuiz && (
           <div className="space-y-6">
-            <div className="card p-6 md:p-8 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[rgba(124,111,224,0.15)] flex items-center justify-center text-[#9d93f7] mx-auto mb-4">
+            <div className="glass-panel p-8 rounded-3xl border border-white/10 text-center shadow-2xl">
+              <div className="w-16 h-16 rounded-2xl bg-[#7c6fe0]/20 flex items-center justify-center text-[#9d93f7] mx-auto mb-4">
                 <Award size={32} />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-1">Quiz Completed!</h2>
-              <p className="text-sm text-gray-400 mb-4">
-                Here is your detailed breakdown and concept diagnostics.
+              <h2 className="text-2xl font-bold text-white mb-1">Quiz Diagnostics Ready</h2>
+              <p className="text-sm text-gray-400 mb-6">
+                Detailed active recall performance breakdown.
               </p>
 
-              {/* Score Display */}
               <div className="inline-block p-4 rounded-2xl bg-white/5 border border-white/10 mb-6">
                 <div className="text-4xl font-extrabold text-white">
                   {quizResult.score}%
@@ -393,12 +384,11 @@ function QuizContent() {
                 </div>
               </div>
 
-              {/* Weak Topics */}
               {quizResult.weakTopics.length > 0 && (
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-left mb-6 max-w-md mx-auto">
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-400 mb-1.5 uppercase">
                     <AlertTriangle size={14} />
-                    <span>Topics to Revise:</span>
+                    <span>Identified Gaps to Revise:</span>
                   </div>
                   <ul className="text-xs text-gray-300 space-y-1 pl-4 list-disc">
                     {quizResult.weakTopics.map((topic, i) => (
@@ -417,17 +407,17 @@ function QuizContent() {
                 className="btn-primary text-xs py-2 px-4 rounded-xl flex items-center justify-center gap-1.5 mx-auto"
               >
                 <RotateCcw size={14} />
-                <span>Create Another Quiz</span>
+                <span>Configure Another Arena</span>
               </button>
             </div>
 
-            {/* Answer Explanations Review */}
-            <div className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
+            {/* Questions Breakdown */}
+            <div className="glass-panel p-6 rounded-3xl border border-white/10">
               <h3 className="font-bold text-base text-white mb-4">
-                Questions & Explanations
+                Answer Analysis & Explanations
               </h3>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {currentQuiz.questions.map((q, idx) => {
                   const userAns = selectedAnswers[q.id];
                   const isCorrect = userAns === q.correctAnswer;
@@ -435,24 +425,24 @@ function QuizContent() {
                   return (
                     <div
                       key={q.id}
-                      className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2"
+                      className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 text-xs"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span className="text-sm font-semibold text-gray-200">
+                        <span className="font-semibold text-white">
                           {idx + 1}. {q.question}
                         </span>
                         {isCorrect ? (
-                          <span className="badge badge-success text-[10px] flex items-center gap-1">
+                          <span className="badge badge-success text-[10px]">
                             <CheckCircle2 size={11} /> Correct
                           </span>
                         ) : (
-                          <span className="badge badge-error text-[10px] flex items-center gap-1">
+                          <span className="badge badge-error text-[10px] bg-red-500/15 text-red-400 border border-red-500/30">
                             <XCircle size={11} /> Incorrect
                           </span>
                         )}
                       </div>
 
-                      <div className="text-xs space-y-1 text-gray-400 pt-1">
+                      <div className="text-gray-400 pt-1 space-y-0.5">
                         <div>
                           Your answer:{" "}
                           <span className={isCorrect ? "text-emerald-400" : "text-red-400 font-semibold"}>
@@ -470,7 +460,7 @@ function QuizContent() {
                       </div>
 
                       {q.explanation && (
-                        <div className="text-xs text-gray-300 p-2.5 rounded-lg bg-black/30 border border-white/5 mt-2">
+                        <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 text-gray-300 mt-2">
                           <strong className="text-[#9d93f7]">Explanation:</strong> {q.explanation}
                         </div>
                       )}
@@ -488,7 +478,7 @@ function QuizContent() {
 
 export default function QuizPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center">Loading Quiz...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#06060c] text-white flex items-center justify-center">Loading Quiz Arena...</div>}>
       <QuizContent />
     </Suspense>
   );

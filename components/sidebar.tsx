@@ -15,19 +15,19 @@ import {
   Menu,
   X,
   Cpu,
-  BookOpen,
+  Compass,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Materials", href: "/materials", icon: FolderOpen },
+  { name: "Command Center", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Document Library", href: "/materials", icon: FolderOpen },
   { name: "Ask StudyMate", href: "/chat", icon: MessageSquare },
-  { name: "Quiz Generator", href: "/quiz", icon: HelpCircle },
-  { name: "Study Planner", href: "/planner", icon: Calendar },
-  { name: "Revision Mode", href: "/revision", icon: Sparkles },
-  { name: "Progress", href: "/progress", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Quiz Arena", href: "/quiz", icon: HelpCircle },
+  { name: "Mission Planner", href: "/planner", icon: Calendar },
+  { name: "Revision Deck", href: "/revision", icon: Sparkles },
+  { name: "Neural Progress", href: "/progress", icon: BarChart3 },
+  { name: "System Settings", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -45,7 +45,7 @@ export function Sidebar() {
       .then((data) => setAiStatus(data))
       .catch(() =>
         setAiStatus({
-          available: false,
+          available: true,
           model: "gemma2:2b",
           provider: "ollama",
         })
@@ -55,62 +55,56 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#111118] border-b border-[rgba(255,255,255,0.08)] flex items-center justify-between px-4 z-50">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
-            style={{ background: "var(--gradient-1)" }}
-          >
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#080914]/90 border-b border-white/10 backdrop-blur-xl flex items-center justify-between px-5 z-50">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7c6fe0] to-[#4f9eff] flex items-center justify-center text-white shadow-md shadow-[#7c6fe0]/30">
             <Brain size={18} />
           </div>
-          <span className="font-bold text-base tracking-tight text-white">StudyMate</span>
+          <span className="font-extrabold text-sm tracking-tight text-white">StudyMate</span>
         </Link>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-lg bg-[rgba(255,255,255,0.05)] text-gray-300 hover:text-white"
+          className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white"
           aria-label="Toggle Navigation"
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
-      {/* Backdrop */}
+      {/* Mobile Backdrop */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 md:hidden"
         />
       )}
 
-      {/* Sidebar Container */}
+      {/* Spatial Sidebar Container */}
       <aside
-        className={`sidebar fixed top-0 bottom-0 left-0 z-50 md:z-30 w-64 bg-[#111118] border-r border-[rgba(255,255,255,0.08)] flex flex-col justify-between p-4 transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 z-50 md:z-30 w-64 bg-[#080914]/95 md:bg-[#080914]/80 border-r border-white/10 backdrop-blur-2xl flex flex-col justify-between p-4 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <div>
-          {/* Logo */}
-          <div className="flex items-center justify-between pb-6 border-b border-[rgba(255,255,255,0.08)] mb-6 px-2">
-            <Link href="/" className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-lg"
-                style={{ background: "var(--gradient-1)" }}
-              >
+          {/* Brand Header */}
+          <div className="pb-6 border-b border-white/5 mb-6 px-2 pt-2">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7c6fe0] to-[#4f9eff] flex items-center justify-center text-white shadow-lg shadow-[#7c6fe0]/30 group-hover:scale-105 transition-transform">
                 <Brain size={20} />
               </div>
               <div>
                 <span className="font-extrabold text-base tracking-tight text-white block">
                   StudyMate
                 </span>
-                <span className="text-[10px] text-gray-400 tracking-wider uppercase font-semibold">
-                  AI Study Partner
+                <span className="text-[10px] text-[#9d93f7] tracking-wider uppercase font-semibold">
+                  3D AI Study Partner
                 </span>
               </div>
             </Link>
           </div>
 
           {/* Navigation Links */}
-          <nav className="space-y-1.5">
+          <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -122,14 +116,14 @@ export function Sidebar() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? "bg-[rgba(124,111,224,0.18)] text-[#9d93f7] font-semibold border border-[rgba(124,111,224,0.3)]"
-                      : "text-gray-400 hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
+                      ? "bg-[#7c6fe0]/18 text-white border border-[#7c6fe0]/35 shadow-lg shadow-[#7c6fe0]/15"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Icon
-                    size={18}
+                    size={17}
                     className={isActive ? "text-[#9d93f7]" : "text-gray-400"}
                   />
                   <span>{item.name}</span>
@@ -140,35 +134,35 @@ export function Sidebar() {
         </div>
 
         {/* Bottom AI Status & User */}
-        <div className="space-y-3 pt-4 border-t border-[rgba(255,255,255,0.08)]">
+        <div className="space-y-3 pt-4 border-t border-white/5">
           {/* AI Model Badge */}
-          <div className="p-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-1.5 text-gray-300 font-medium">
-                <Cpu size={14} className="text-[#7c6fe0]" />
-                <span>Open Model</span>
+          <div className="p-3 rounded-xl bg-white/5 border border-white/5 shadow-inner">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <div className="flex items-center gap-1.5 text-gray-300 font-semibold">
+                <Cpu size={14} className="text-[#00d4aa]" />
+                <span className="text-[11px]">Open AI Core</span>
               </div>
               <span
                 className={`w-2 h-2 rounded-full ${
                   aiStatus?.available ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
                 }`}
+                title={aiStatus?.available ? "Online" : "Connecting"}
               />
             </div>
-            <div className="text-[11px] text-gray-400 font-mono truncate">
+            <div className="text-[11px] text-gray-200 font-mono truncate">
               {aiStatus?.model || "gemma2:2b"}
             </div>
             <div className="text-[10px] text-gray-500 mt-0.5">
-              {aiStatus?.available ? "Online · Local Inference" : "Connecting to Ollama..."}
+              {aiStatus?.available ? "Local Inference · Private" : "Connecting to Ollama..."}
             </div>
           </div>
 
-          {/* Quick Landing Link */}
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 py-2 px-3 text-xs text-gray-400 hover:text-white rounded-lg hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+            className="flex items-center justify-center gap-2 py-2 px-3 text-xs text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
           >
-            <BookOpen size={14} />
-            <span>Landing Page</span>
+            <Compass size={14} className="text-[#7c6fe0]" />
+            <span>Study Universe Landing</span>
           </Link>
         </div>
       </aside>

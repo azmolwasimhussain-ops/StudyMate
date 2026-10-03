@@ -60,23 +60,30 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-[#06060c] text-white flex">
       <Sidebar />
 
-      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-4xl mx-auto w-full">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-white mb-1">
-            System & AI Settings
-          </h1>
-          <p className="text-sm text-gray-400">
-            Inspect your open-weight AI provider, local Ollama inference server, and PostgreSQL database.
-          </p>
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-4xl mx-auto w-full space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#7c6fe0]/15 border border-[#7c6fe0]/30 text-[#9d93f7] uppercase tracking-wider">
+                System Diagnostics
+              </span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+              System & AI Telemetry
+            </h1>
+            <p className="text-sm text-gray-400 mt-1 max-w-xl">
+              Inspect your local open-weight AI model inference server, vector embeddings, and PostgreSQL database.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-6">
           {/* Status Overview Card */}
-          <div className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <div className="flex items-center justify-between pb-4 border-b border-[rgba(255,255,255,0.08)] mb-6">
+          <div className="glass-panel p-6 rounded-2xl border border-white/10">
+            <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-6">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <Cpu size={18} className="text-[#7c6fe0]" />
                 <span>Active Infrastructure</span>
@@ -93,7 +100,7 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* AI Provider Status */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-[#7c6fe0]/30 transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase font-semibold">
                     AI Inference Layer
@@ -114,13 +121,13 @@ export default function SettingsPage() {
                 <div className="text-xs font-mono text-[#9d93f7]">
                   Model: {health?.model || "gemma2:2b"}
                 </div>
-                <div className="text-[11px] text-gray-500 mt-2">
+                <div className="text-[11px] text-gray-400 mt-2">
                   Open-weight model running locally via Ollama.
                 </div>
               </div>
 
               {/* Database Status */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase font-semibold">
                     Relational Database
@@ -141,7 +148,7 @@ export default function SettingsPage() {
                 <div className="text-xs font-mono text-emerald-400">
                   Prisma ORM · studymate
                 </div>
-                <div className="text-[11px] text-gray-500 mt-2">
+                <div className="text-[11px] text-gray-400 mt-2">
                   Persists materials, chunks, quizzes, and study progress.
                 </div>
               </div>
@@ -149,7 +156,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Test AI Inference Card */}
-          <div className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
+          <div className="glass-panel p-6 rounded-2xl border border-white/10">
             <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
               <Sparkles size={18} className="text-[#00d4aa]" />
               <span>Test Model Response</span>
@@ -161,7 +168,7 @@ export default function SettingsPage() {
             <button
               onClick={handleTestInference}
               disabled={testing}
-              className="btn-primary text-xs py-2 px-4 rounded-xl flex items-center gap-2 mb-4"
+              className="btn-primary text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 mb-4 font-semibold"
             >
               {testing ? (
                 <>
@@ -174,14 +181,14 @@ export default function SettingsPage() {
             </button>
 
             {testResult && (
-              <div className="p-4 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-gray-200 whitespace-pre-wrap leading-relaxed">
+              <div className="p-4 rounded-xl bg-black/50 border border-[#7c6fe0]/30 text-xs font-mono text-gray-200 whitespace-pre-wrap leading-relaxed">
                 {testResult}
               </div>
             )}
           </div>
 
           {/* Configuration Instructions */}
-          <div className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
+          <div className="glass-panel p-6 rounded-2xl border border-white/10">
             <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
               <Terminal size={18} className="text-amber-400" />
               <span>How to Change Models</span>
@@ -190,11 +197,11 @@ export default function SettingsPage() {
               StudyMate works with any open-weight model supported by Ollama. To switch to a different model:
             </p>
 
-            <div className="space-y-2 text-xs font-mono bg-black/40 p-4 rounded-xl border border-white/5 text-gray-300">
+            <div className="space-y-2 text-xs font-mono bg-black/60 p-4 rounded-xl border border-white/5 text-gray-300">
               <p className="text-gray-500"># 1. Pull your desired open model</p>
               <p className="text-emerald-400">ollama pull gemma2:2b</p>
-              <p className="text-emerald-400">ollama pull qwen3.5:4b</p>
-              <p className="text-emerald-400">ollama pull llama3:latest</p>
+              <p className="text-emerald-400">ollama pull qwen2.5:3b</p>
+              <p className="text-emerald-400">ollama pull llama3.2:3b</p>
               <br />
               <p className="text-gray-500"># 2. Update .env</p>
               <p className="text-amber-300">AI_MODEL=gemma2:2b</p>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Sidebar } from "@/components/sidebar";
 import {
   MessageSquare,
@@ -18,8 +19,21 @@ import {
   TrendingUp,
   Cpu,
   Layers,
+  Compass,
 } from "lucide-react";
 import { getGreeting } from "@/lib/utils/helpers";
+
+const StudyCore = dynamic(
+  () => import("@/components/3d/study-core").then((mod) => mod.StudyCore),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-24 h-24 rounded-full border border-[#7c6fe0]/30 animate-pulse" />
+      </div>
+    ),
+  }
+);
 
 interface DashboardData {
   materialsCount: number;
@@ -50,22 +64,16 @@ export default function DashboardPage() {
           fetch("/api/health"),
         ]);
 
-        if (progRes.ok) {
-          const progData = await progRes.json();
-          setData(progData);
-        }
+        if (progRes.ok) setData(await progRes.json());
         if (matRes.ok) {
-          const matData = await matRes.json();
-          setMaterials(matData.materials || []);
+          const m = await matRes.json();
+          setMaterials(m.materials || []);
         }
         if (planRes.ok) {
-          const planData = await planRes.json();
-          setPlans(planData.plans || []);
+          const p = await planRes.json();
+          setPlans(p.plans || []);
         }
-        if (healthRes.ok) {
-          const hData = await healthRes.json();
-          setAiStatus(hData);
-        }
+        if (healthRes.ok) setAiStatus(await healthRes.json());
       } catch (err) {
         console.error("Dashboard load error:", err);
       } finally {
@@ -78,32 +86,30 @@ export default function DashboardPage() {
   const greeting = getGreeting();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-[#06060c] text-white flex">
       <Sidebar />
 
-      {/* Main Content Area */}
-      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-7xl mx-auto w-full">
-        {/* Top Header / Greeting */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-7xl mx-auto w-full space-y-8">
+        {/* Command Center Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xl md:text-2xl font-bold tracking-tight">
-                {greeting} 👋
+              <span className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+                {greeting}, Azmol 👋
               </span>
             </div>
             <p className="text-sm text-gray-400">
-              Ready to study? Here is your personalized companion overview.
+              Welcome to your Study Command Center. What are you mastering today?
             </p>
           </div>
 
-          {/* AI Model Badge */}
-          <div className="flex items-center gap-3 bg-[#111118] border border-[rgba(255,255,255,0.08)] px-4 py-2 rounded-xl text-xs">
-            <Cpu size={16} className="text-[#7c6fe0]" />
+          <div className="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-2xl border border-white/10 self-start md:self-auto">
+            <Cpu size={18} className="text-[#00d4aa]" />
             <div>
-              <div className="text-[10px] text-gray-400 font-semibold tracking-wider uppercase">
-                Active AI Partner
+              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                Inference Neural Core
               </div>
-              <div className="font-mono text-gray-200">
+              <div className="font-mono text-xs text-white">
                 {aiStatus?.model || "gemma2:2b"} · {aiStatus?.provider || "Ollama"}
               </div>
             </div>
@@ -111,349 +117,256 @@ export default function DashboardPage() {
               className={`w-2.5 h-2.5 rounded-full ml-1 ${
                 aiStatus?.available ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
               }`}
-              title={aiStatus?.available ? "Ollama Online" : "Ollama Offline"}
             />
           </div>
         </div>
 
-        {/* Quick Action Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
-          <Link
-            href="/chat"
-            className="card p-4 md:p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] hover:border-[#7c6fe0] hover:bg-[rgba(124,111,224,0.06)] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[rgba(124,111,224,0.15)] flex items-center justify-center text-[#9d93f7] mb-3 group-hover:scale-105 transition-transform">
-              <MessageSquare size={20} />
+        {/* Central 3D Knowledge Core HUD */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {/* Left 2 Cols: 3D Knowledge Sphere & Spatial Overview */}
+          <div className="lg:col-span-2 glass-panel p-6 md:p-8 rounded-3xl border border-white/10 relative overflow-hidden flex flex-col justify-between min-h-[360px]">
+            <div className="flex items-center justify-between z-10">
+              <div>
+                <span className="badge badge-purple text-[10px] mb-1">Knowledge Hub</span>
+                <h2 className="text-xl font-bold text-white tracking-tight">
+                  Your Digital Study Universe
+                </h2>
+              </div>
+              <span className="text-xs text-gray-400 font-mono hidden sm:inline-block">
+                {materials.length} Materials Loaded
+              </span>
             </div>
-            <h3 className="font-semibold text-sm md:text-base text-white mb-0.5">
-              Ask StudyMate
-            </h3>
-            <p className="text-xs text-gray-400">Chat with your notes</p>
-          </Link>
 
-          <Link
-            href="/quiz"
-            className="card p-4 md:p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] hover:border-[#4f9eff] hover:bg-[rgba(79,158,255,0.06)] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[rgba(79,158,255,0.15)] flex items-center justify-center text-[#4f9eff] mb-3 group-hover:scale-105 transition-transform">
-              <HelpCircle size={20} />
+            {/* Embedded 3D Canvas */}
+            <div className="w-full h-[220px] md:h-[260px] my-2 relative">
+              <StudyCore className="w-full h-full" />
             </div>
-            <h3 className="font-semibold text-sm md:text-base text-white mb-0.5">
-              Generate Quiz
-            </h3>
-            <p className="text-xs text-gray-400">Test comprehension</p>
-          </Link>
 
-          <Link
-            href="/planner"
-            className="card p-4 md:p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] hover:border-[#00d4aa] hover:bg-[rgba(0,212,170,0.06)] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[rgba(0,212,170,0.15)] flex items-center justify-center text-[#00d4aa] mb-3 group-hover:scale-105 transition-transform">
-              <Calendar size={20} />
-            </div>
-            <h3 className="font-semibold text-sm md:text-base text-white mb-0.5">
-              Study Plan
-            </h3>
-            <p className="text-xs text-gray-400">Day-by-day roadmap</p>
-          </Link>
-
-          <Link
-            href="/revision"
-            className="card p-4 md:p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)] hover:border-amber-400 hover:bg-[rgba(255,193,7,0.06)] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[rgba(255,193,7,0.15)] flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
-              <Sparkles size={20} />
-            </div>
-            <h3 className="font-semibold text-sm md:text-base text-white mb-0.5">
-              Start Revision
-            </h3>
-            <p className="text-xs text-gray-400">Flashcards & concepts</p>
-          </Link>
-        </div>
-
-        {/* Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
-          <div className="p-4 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-              <span>Study Streak</span>
-              <Flame size={16} className="text-amber-400" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {data?.streak || 0} <span className="text-xs font-normal text-gray-400">days</span>
-            </div>
-            <div className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-              Active learning habit
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-              <span>Materials</span>
-              <BookOpen size={16} className="text-[#7c6fe0]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {data?.materialsCount || materials.length || 0}
-            </div>
-            <div className="text-[11px] text-gray-400 mt-1">
-              {data?.totalChunks || 0} chunks indexed
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-              <span>Quiz Accuracy</span>
-              <TrendingUp size={16} className="text-[#4f9eff]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {data?.avgScore ? `${data.avgScore}%` : "—"}
-            </div>
-            <div className="text-[11px] text-gray-400 mt-1">
-              {data?.totalAttempts || 0} quizzes taken
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-              <span>Plan Progress</span>
-              <CheckCircle2 size={16} className="text-[#00d4aa]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {data?.totalTasks
-                ? `${Math.round((data.completedTasks / data.totalTasks) * 100)}%`
-                : "—"}
-            </div>
-            <div className="text-[11px] text-gray-400 mt-1">
-              {data?.completedTasks || 0} / {data?.totalTasks || 0} tasks done
-            </div>
-          </div>
-        </div>
-
-        {/* 2-Column Content Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Recent Materials & Today's Study Plan (2 cols) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Active Study Plan / Today's Tasks */}
-            <div className="card p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar size={18} className="text-[#00d4aa]" />
-                  <h2 className="font-bold text-base text-white">
-                    Today&apos;s Study Plan
-                  </h2>
+            {/* Bottom Micro Stats */}
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/5 z-10 text-center">
+              <div>
+                <div className="text-xs text-gray-400">Streak</div>
+                <div className="text-lg font-extrabold text-white flex items-center justify-center gap-1">
+                  <Flame size={15} className="text-amber-400" />
+                  <span>{data?.streak || 0}d</span>
                 </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-400">Total Chunks</div>
+                <div className="text-lg font-extrabold text-[#7c6fe0]">
+                  {data?.totalChunks || 0}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-400">Quiz Accuracy</div>
+                <div className="text-lg font-extrabold text-[#00d4aa]">
+                  {data?.avgScore ? `${data.avgScore}%` : "—"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Col: Quick Actions & Weak Topic Diagnostics */}
+          <div className="space-y-6 flex flex-col justify-between">
+            {/* Quick Actions Panel */}
+            <div className="glass-panel p-6 rounded-3xl border border-white/10 flex-1">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Sparkles size={15} className="text-[#7c6fe0]" />
+                <span>Command Actions</span>
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href="/chat"
+                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#7c6fe0] hover:bg-[#7c6fe0]/10 transition-all flex flex-col items-center text-center group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-[#7c6fe0]/20 flex items-center justify-center text-[#9d93f7] mb-2 group-hover:scale-110 transition-transform">
+                    <MessageSquare size={17} />
+                  </div>
+                  <span className="text-xs font-semibold text-white">Ask AI</span>
+                  <span className="text-[10px] text-gray-400 mt-0.5">RAG Chat</span>
+                </Link>
+
+                <Link
+                  href="/quiz"
+                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#4f9eff] hover:bg-[#4f9eff]/10 transition-all flex flex-col items-center text-center group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-[#4f9eff]/20 flex items-center justify-center text-[#4f9eff] mb-2 group-hover:scale-110 transition-transform">
+                    <HelpCircle size={17} />
+                  </div>
+                  <span className="text-xs font-semibold text-white">Quiz Arena</span>
+                  <span className="text-[10px] text-gray-400 mt-0.5">Active Recall</span>
+                </Link>
+
                 <Link
                   href="/planner"
-                  className="text-xs text-[#00d4aa] hover:underline flex items-center gap-1"
+                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#00d4aa] hover:bg-[#00d4aa]/10 transition-all flex flex-col items-center text-center group"
                 >
-                  Manage Plans <ArrowRight size={13} />
+                  <div className="w-9 h-9 rounded-xl bg-[#00d4aa]/20 flex items-center justify-center text-[#00d4aa] mb-2 group-hover:scale-110 transition-transform">
+                    <Calendar size={17} />
+                  </div>
+                  <span className="text-xs font-semibold text-white">Roadmap</span>
+                  <span className="text-[10px] text-gray-400 mt-0.5">Study Plan</span>
+                </Link>
+
+                <Link
+                  href="/revision"
+                  className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-amber-400 hover:bg-amber-400/10 transition-all flex flex-col items-center text-center group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-amber-400/20 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-110 transition-transform">
+                    <Sparkles size={17} />
+                  </div>
+                  <span className="text-xs font-semibold text-white">Revision</span>
+                  <span className="text-[10px] text-gray-400 mt-0.5">3D Deck</span>
                 </Link>
               </div>
-
-              {plans.length > 0 && plans[0]?.tasks?.length > 0 ? (
-                <div className="space-y-2.5">
-                  <div className="text-xs text-gray-400 mb-2">
-                    Active Plan: <span className="text-gray-200 font-semibold">{plans[0].title}</span>
-                  </div>
-                  {plans[0].tasks.slice(0, 3).map((task: any) => (
-                    <div
-                      key={task.id}
-                      className="p-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] flex items-center justify-between gap-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold ${
-                            task.completed
-                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                              : "bg-white/5 text-gray-400 border border-white/10"
-                          }`}
-                        >
-                          {task.day}
-                        </span>
-                        <div>
-                          <div
-                            className={`text-sm font-medium ${
-                              task.completed
-                                ? "line-through text-gray-500"
-                                : "text-gray-200"
-                            }`}
-                          >
-                            {task.title}
-                          </div>
-                          {task.description && (
-                            <div className="text-xs text-gray-400 line-clamp-1">
-                              {task.description}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-xs text-gray-400 font-mono whitespace-nowrap">
-                        {task.duration}h
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-8 text-center border border-dashed border-[rgba(255,255,255,0.08)] rounded-xl">
-                  <Calendar size={32} className="mx-auto text-gray-600 mb-2" />
-                  <p className="text-sm text-gray-300 font-medium">No study plan created yet</p>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Let AI create a day-by-day exam roadmap from your topics.
-                  </p>
-                  <Link
-                    href="/planner"
-                    className="btn-primary text-xs py-1.5 px-3 rounded-lg"
-                  >
-                    Create Study Plan
-                  </Link>
-                </div>
-              )}
             </div>
 
-            {/* Recent Study Materials */}
-            <div className="card p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <FolderOpen size={18} className="text-[#7c6fe0]" />
-                  <h2 className="font-bold text-base text-white">
-                    Recent Materials
-                  </h2>
-                </div>
-                <Link
-                  href="/materials"
-                  className="text-xs text-[#7c6fe0] hover:underline flex items-center gap-1"
-                >
-                  View All <ArrowRight size={13} />
-                </Link>
+            {/* Weak Topics Diagnostic */}
+            <div className="glass-panel p-5 rounded-3xl border border-white/10">
+              <div className="flex items-center gap-2 mb-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
+                <AlertTriangle size={15} />
+                <span>Diagnostics: Weak Topics</span>
               </div>
-
-              {materials.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {materials.slice(0, 4).map((mat) => (
+              {data?.weakTopics && data.weakTopics.length > 0 ? (
+                <div className="space-y-2 mt-3">
+                  {data.weakTopics.slice(0, 2).map((item, idx) => (
                     <div
-                      key={mat.id}
-                      className="p-3.5 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.15)] transition-colors"
+                      key={idx}
+                      className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-between text-xs"
                     >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-sm font-semibold text-gray-200 line-clamp-1">
-                          {mat.title}
-                        </span>
-                        <span className="badge badge-success text-[10px]">
-                          ✓ {mat.status}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-400 flex items-center justify-between">
-                        <span>{mat._count?.chunks || mat.chunkCount || 0} chunks</span>
-                        <span className="uppercase text-[10px] text-gray-500">
-                          {mat.fileName?.split(".").pop()}
-                        </span>
-                      </div>
-                      <div className="flex gap-2 mt-3 pt-2.5 border-t border-[rgba(255,255,255,0.06)]">
-                        <Link
-                          href={`/chat?materialId=${mat.id}`}
-                          className="text-xs text-[#7c6fe0] hover:underline"
-                        >
-                          Ask AI
-                        </Link>
-                        <span className="text-gray-600">·</span>
-                        <Link
-                          href={`/quiz?materialId=${mat.id}`}
-                          className="text-xs text-[#4f9eff] hover:underline"
-                        >
-                          Quiz
-                        </Link>
-                        <span className="text-gray-600">·</span>
-                        <Link
-                          href={`/revision?materialId=${mat.id}`}
-                          className="text-xs text-amber-400 hover:underline"
-                        >
-                          Revise
-                        </Link>
-                      </div>
+                      <span className="text-red-200 font-medium truncate max-w-[170px]">
+                        {item.topic}
+                      </span>
+                      <span className="text-red-400 font-bold">{item.accuracy}%</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center border border-dashed border-[rgba(255,255,255,0.08)] rounded-xl">
-                  <FolderOpen size={32} className="mx-auto text-gray-600 mb-2" />
-                  <p className="text-sm text-gray-300 font-medium">No materials uploaded</p>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Upload your lecture notes, PDF textbook, or markdown notes to begin.
-                  </p>
-                  <Link
-                    href="/materials"
-                    className="btn-primary text-xs py-1.5 px-3 rounded-lg"
-                  >
-                    Upload Document
-                  </Link>
-                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Take active recall quizzes in the Arena to detect mastery gaps automatically.
+                </p>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Right Column: Weak Topics & Recent Activity */}
-          <div className="space-y-6">
-            {/* Weak Topics Card */}
-            <div className="card p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle size={18} className="text-amber-400" />
-                <h2 className="font-bold text-base text-white">Weak Topics</h2>
+        {/* 2-Column Section: Active Mission Roadmap & Document Library */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Active Mission Roadmap */}
+          <div className="glass-panel p-6 rounded-3xl border border-white/10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Calendar size={18} className="text-[#00d4aa]" />
+                <h3 className="font-bold text-base text-white">Active Learning Mission</h3>
               </div>
-              <p className="text-xs text-gray-400 mb-3">
-                Identified from your quiz mistakes. Focus study sessions here.
-              </p>
-
-              {data?.weakTopics && data.weakTopics.length > 0 ? (
-                <div className="space-y-2">
-                  {data.weakTopics.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-xl bg-red-500/5 border border-red-500/15 flex items-center justify-between"
-                    >
-                      <span className="text-xs text-red-200 font-medium truncate max-w-[160px]">
-                        {item.topic}
-                      </span>
-                      <span className="text-xs font-semibold text-red-400">
-                        {item.accuracy}% acc
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-6 text-center text-xs text-gray-500 bg-[rgba(255,255,255,0.02)] rounded-xl">
-                  Take quizzes to identify specific topic gaps automatically!
-                </div>
-              )}
+              <Link href="/planner" className="text-xs text-[#00d4aa] hover:underline flex items-center gap-1">
+                <span>View All</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
 
-            {/* Recent Activity */}
-            <div className="card p-5 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]">
-              <div className="flex items-center gap-2 mb-3">
-                <Clock size={18} className="text-[#4f9eff]" />
-                <h2 className="font-bold text-base text-white">Recent Activity</h2>
-              </div>
-
-              {data?.recentActivities && data.recentActivities.length > 0 ? (
-                <div className="space-y-2.5">
-                  {data.recentActivities.map((act) => (
-                    <div
-                      key={act.id}
-                      className="text-xs p-2.5 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.04)]"
-                    >
-                      <div className="text-gray-300 font-medium line-clamp-1">
-                        {act.title}
-                      </div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">
-                        {new Date(act.date).toLocaleDateString()}
+            {plans.length > 0 && plans[0]?.tasks?.length > 0 ? (
+              <div className="space-y-3">
+                <div className="text-xs text-gray-400">
+                  Target: <strong className="text-white">{plans[0].title}</strong>
+                </div>
+                {plans[0].tasks.slice(0, 3).map((task: any) => (
+                  <div
+                    key={task.id}
+                    className="p-3.5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
+                          task.completed
+                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                            : "bg-white/5 text-gray-400 border border-white/10"
+                        }`}
+                      >
+                        {task.day}
+                      </span>
+                      <div>
+                        <div
+                          className={`text-sm font-semibold ${
+                            task.completed ? "line-through text-gray-500" : "text-gray-100"
+                          }`}
+                        >
+                          {task.title}
+                        </div>
+                        {task.description && (
+                          <div className="text-xs text-gray-400 line-clamp-1">{task.description}</div>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-6 text-center text-xs text-gray-500 bg-[rgba(255,255,255,0.02)] rounded-xl">
-                  No activity recorded yet. Start by uploading a document.
-                </div>
-              )}
+                    <span className="text-xs text-gray-400 font-mono">{task.duration}h</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-10 text-center border border-dashed border-white/10 rounded-2xl">
+                <Calendar size={32} className="mx-auto text-gray-600 mb-2" />
+                <p className="text-xs text-gray-300 font-medium">No active mission</p>
+                <Link href="/planner" className="btn-primary text-xs py-1.5 px-3 rounded-lg mt-3 inline-flex">
+                  Create Learning Mission
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Document Library Preview */}
+          <div className="glass-panel p-6 rounded-3xl border border-white/10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FolderOpen size={18} className="text-[#7c6fe0]" />
+                <h3 className="font-bold text-base text-white">Document Library</h3>
+              </div>
+              <Link href="/materials" className="text-xs text-[#7c6fe0] hover:underline flex items-center gap-1">
+                <span>Manage</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
+
+            {materials.length > 0 ? (
+              <div className="space-y-3">
+                {materials.slice(0, 3).map((mat) => (
+                  <div
+                    key={mat.id}
+                    className="p-3.5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between gap-3 hover:border-white/15 transition-colors"
+                  >
+                    <div>
+                      <div className="text-sm font-semibold text-white line-clamp-1">{mat.title}</div>
+                      <div className="text-[11px] text-gray-400 flex items-center gap-2 mt-0.5">
+                        <span className="badge badge-success text-[9px]">✓ {mat.status}</span>
+                        <span>{mat._count?.chunks || mat.chunkCount || 0} chunks</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/chat?materialId=${mat.id}`}
+                        className="text-xs text-[#7c6fe0] hover:underline px-2 py-1 rounded bg-[#7c6fe0]/10"
+                      >
+                        Ask AI
+                      </Link>
+                      <Link
+                        href={`/quiz?materialId=${mat.id}`}
+                        className="text-xs text-[#4f9eff] hover:underline px-2 py-1 rounded bg-[#4f9eff]/10"
+                      >
+                        Quiz
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-10 text-center border border-dashed border-white/10 rounded-2xl">
+                <FolderOpen size={32} className="mx-auto text-gray-600 mb-2" />
+                <p className="text-xs text-gray-300 font-medium">No documents uploaded yet</p>
+                <Link href="/materials" className="btn-primary text-xs py-1.5 px-3 rounded-lg mt-3 inline-flex">
+                  Upload PDF / Notes
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </main>

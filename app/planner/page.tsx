@@ -5,15 +5,16 @@ import { Sidebar } from "@/components/sidebar";
 import {
   Calendar,
   Sparkles,
-  CheckCircle2,
-  Circle,
+  Check,
   Plus,
   Trash2,
   Clock,
   BookOpen,
   Loader2,
   AlertCircle,
-  Check,
+  Flag,
+  Target,
+  Compass,
 } from "lucide-react";
 
 interface StudyTask {
@@ -41,7 +42,6 @@ export default function PlannerPage() {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [goal, setGoal] = useState("");
   const [examDate, setExamDate] = useState("");
@@ -107,7 +107,6 @@ export default function PlannerPage() {
 
   const handleToggleTask = async (planId: string, taskId: string, currentStatus: boolean) => {
     try {
-      // Optimistic update
       setPlans((prev) =>
         prev.map((p) => {
           if (p.id !== planId) return p;
@@ -130,12 +129,12 @@ export default function PlannerPage() {
       });
     } catch (err) {
       console.error("Failed to toggle task", err);
-      await fetchPlans(); // revert on failure
+      await fetchPlans();
     }
   };
 
   const handleDeletePlan = async (planId: string) => {
-    if (!confirm("Are you sure you want to delete this study plan?")) return;
+    if (!confirm("Delete this mission study roadmap?")) return;
     try {
       await fetch(`/api/planner/${planId}`, { method: "DELETE" });
       setPlans((prev) => prev.filter((p) => p.id !== planId));
@@ -145,18 +144,17 @@ export default function PlannerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-[#06060c] text-white flex">
       <Sidebar />
 
-      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 min-h-screen max-w-5xl mx-auto w-full space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/5">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white mb-1">
-              Personalized Study Planner
+              Mission Control: Study Roadmap
             </h1>
             <p className="text-sm text-gray-400">
-              AI-generated day-by-day roadmap tailored to your target exam date and daily hours.
+              AI-generated learning trajectories aligned with target exam deadlines and daily hours.
             </p>
           </div>
           <button
@@ -164,36 +162,35 @@ export default function PlannerPage() {
             className="btn-primary text-xs py-2 px-3.5 self-start sm:self-auto flex items-center gap-1.5"
           >
             <Plus size={15} />
-            <span>Create Study Plan</span>
+            <span>Launch New Mission</span>
           </button>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
             <AlertCircle size={18} />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Plans List */}
         {loading ? (
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="h-44 skeleton rounded-2xl" />
+              <div key={i} className="h-44 rounded-3xl glass-panel animate-pulse" />
             ))}
           </div>
         ) : plans.length === 0 ? (
-          <div className="card p-12 text-center rounded-2xl bg-[#111118] border border-dashed border-[rgba(255,255,255,0.08)]">
-            <Calendar size={44} className="mx-auto text-gray-600 mb-3" />
-            <h3 className="font-semibold text-gray-200 mb-1">No Study Plans Yet</h3>
+          <div className="glass-panel p-12 text-center rounded-3xl border border-dashed border-white/10 shadow-2xl">
+            <Target size={44} className="mx-auto text-[#7c6fe0] mb-3" />
+            <h3 className="font-semibold text-gray-200 mb-1">No Missions Planned</h3>
             <p className="text-xs text-gray-400 max-w-sm mx-auto mb-4">
-              Enter your upcoming exam or learning goal and let the open AI model break it down into realistic daily tasks.
+              Enter your upcoming exam or goal and let open-weight AI generate a structured day-by-day roadmap.
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
               className="btn-primary text-xs py-2 px-4 rounded-xl"
             >
-              Generate First Plan
+              Generate First Roadmap
             </button>
           </div>
         ) : (
@@ -207,47 +204,41 @@ export default function PlannerPage() {
               return (
                 <div
                   key={plan.id}
-                  className="card p-6 rounded-2xl bg-[#111118] border border-[rgba(255,255,255,0.08)]"
+                  className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6"
                 >
-                  {/* Plan Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[rgba(255,255,255,0.08)]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/5">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h2 className="text-lg font-bold text-white">
-                          {plan.title}
-                        </h2>
+                      <div className="flex items-center gap-2 mb-1.5">
                         <span className="badge badge-purple text-[10px]">
                           {plan.hoursPerDay} hrs/day
                         </span>
+                        <h2 className="text-lg font-bold text-white tracking-tight">
+                          {plan.title}
+                        </h2>
                       </div>
                       <div className="text-xs text-gray-400 flex items-center gap-3">
                         <span>Goal: {plan.goal}</span>
                         {plan.examDate && (
                           <>
                             <span>·</span>
-                            <span>
-                              Exam: {new Date(plan.examDate).toLocaleDateString()}
-                            </span>
+                            <span>Target: {new Date(plan.examDate).toLocaleDateString()}</span>
                           </>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-xs font-semibold text-gray-300">
                           {completedCount} / {totalCount} completed ({progressPct}%)
                         </div>
-                        <div className="w-28 progress-bar mt-1.5 h-1.5">
-                          <div
-                            className="progress-fill"
-                            style={{ width: `${progressPct}%` }}
-                          />
+                        <div className="w-32 progress-bar mt-1.5 h-1.5">
+                          <div className="progress-fill" style={{ width: `${progressPct}%` }} />
                         </div>
                       </div>
                       <button
                         onClick={() => handleDeletePlan(plan.id)}
-                        className="text-gray-500 hover:text-red-400 p-1.5 rounded-lg transition-colors ml-2"
+                        className="text-gray-500 hover:text-red-400 p-2 rounded-xl transition-colors"
                         title="Delete Plan"
                       >
                         <Trash2 size={16} />
@@ -255,28 +246,28 @@ export default function PlannerPage() {
                     </div>
                   </div>
 
-                  {/* Tasks List */}
-                  <div className="mt-4 space-y-2.5">
+                  {/* Day by Day Mission Nodes */}
+                  <div className="space-y-2.5">
                     {plan.tasks.map((task) => (
                       <div
                         key={task.id}
                         onClick={() => handleToggleTask(plan.id, task.id, task.completed)}
-                        className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                        className={`p-4 rounded-2xl border flex items-center justify-between gap-4 cursor-pointer transition-all ${
                           task.completed
                             ? "bg-emerald-500/5 border-emerald-500/20 text-gray-400"
-                            : "bg-white/5 border-white/5 hover:border-white/15 text-gray-200"
+                            : "bg-white/5 border-white/5 hover:border-white/20 text-gray-200"
                         }`}
                       >
-                        <div className="flex items-center gap-3.5">
+                        <div className="flex items-center gap-4">
                           <button
                             type="button"
-                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
                               task.completed
-                                ? "bg-emerald-500 text-black font-bold"
-                                : "border border-white/20 text-transparent"
+                                ? "bg-emerald-500 text-black font-bold shadow-md shadow-emerald-500/20"
+                                : "border border-white/20 text-transparent hover:border-white/40"
                             }`}
                           >
-                            <Check size={13} />
+                            <Check size={14} />
                           </button>
                           <div>
                             <div className="flex items-center gap-2">
@@ -284,22 +275,22 @@ export default function PlannerPage() {
                                 Day {task.day}
                               </span>
                               <span
-                                className={`text-sm font-medium ${
-                                  task.completed ? "line-through text-gray-500" : ""
+                                className={`text-sm font-semibold ${
+                                  task.completed ? "line-through text-gray-500" : "text-white"
                                 }`}
                               >
                                 {task.title}
                               </span>
                             </div>
                             {task.description && (
-                              <p className="text-xs text-gray-400 mt-0.5">
+                              <p className="text-xs text-gray-400 mt-0.5 leading-normal">
                                 {task.description}
                               </p>
                             )}
                           </div>
                         </div>
 
-                        <span className="text-xs font-mono text-gray-400 whitespace-nowrap bg-black/20 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-mono text-gray-400 whitespace-nowrap bg-black/30 px-2.5 py-1 rounded-md border border-white/5">
                           {task.duration}h
                         </span>
                       </div>
@@ -311,34 +302,34 @@ export default function PlannerPage() {
           </div>
         )}
 
-        {/* Modal: Create Plan */}
+        {/* Modal: Launch Roadmap */}
         {showCreateModal && (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#111118] border border-[rgba(255,255,255,0.12)] rounded-2xl w-full max-w-lg p-6 animate-fade-in">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div className="glass-panel bg-[#0d0e1c] border border-white/15 rounded-3xl w-full max-w-lg p-6 shadow-2xl">
               <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
                 <Sparkles size={18} className="text-[#00d4aa]" />
-                Generate AI Study Plan
+                <span>Synthesize Mission Roadmap</span>
               </h3>
-              <p className="text-xs text-gray-400 mb-4">
-                Powered by open-weight AI model to balance topics, spaced repetition, and review.
+              <p className="text-xs text-gray-400 mb-5">
+                AI structures your timeline considering cognitive load and spaced recall.
               </p>
 
               <form onSubmit={handleCreatePlan} className="space-y-4">
                 <div>
-                  <label className="label">Exam or Subject Goal</label>
+                  <label className="label">Exam or Learning Goal</label>
                   <input
                     type="text"
                     required
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
-                    placeholder="e.g. DBMS Midterms or Calculus II Finals"
+                    placeholder="e.g. Operating Systems Final Exam"
                     className="input"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="label">Exam Date (Optional)</label>
+                    <label className="label">Target Date (Optional)</label>
                     <input
                       type="date"
                       value={examDate}
@@ -347,7 +338,7 @@ export default function PlannerPage() {
                     />
                   </div>
                   <div>
-                    <label className="label">Hours Per Day</label>
+                    <label className="label">Daily Study Hours</label>
                     <input
                       type="number"
                       min={1}
@@ -360,12 +351,12 @@ export default function PlannerPage() {
                 </div>
 
                 <div>
-                  <label className="label">Topics to Cover (comma or newline separated)</label>
+                  <label className="label">Topics to Cover</label>
                   <textarea
                     rows={4}
                     value={topicsInput}
                     onChange={(e) => setTopicsInput(e.target.value)}
-                    placeholder="e.g. Relational Algebra, Normalization, SQL Joins, Concurrency Control, Indexing..."
+                    placeholder="e.g. Scheduling Algorithms, Deadlocks, Memory Management, File Systems..."
                     className="input text-xs resize-none"
                   />
                 </div>
@@ -386,10 +377,10 @@ export default function PlannerPage() {
                     {generating ? (
                       <>
                         <Loader2 size={14} className="animate-spin" />
-                        Generating Schedule...
+                        Generating Roadmap...
                       </>
                     ) : (
-                      "Generate Plan"
+                      "Generate Roadmap"
                     )}
                   </button>
                 </div>

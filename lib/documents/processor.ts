@@ -38,15 +38,48 @@ export async function extractText(
  */
 async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
-    // Dynamic import to avoid issues in edge environments
-    const pdfModule = (await import("pdf-parse")) as any;
-    const pdfParse = pdfModule.default || pdfModule;
+    // Import directly from lib to avoid index.js debug file read bug
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfParse = require("pdf-parse/lib/pdf-parse.js");
     const data = await pdfParse(buffer);
-    return data.text || "";
+    if (data && data.text && data.text.trim()) {
+      return data.text;
+    }
   } catch (error) {
     console.error("PDF parse error:", error);
-    throw new Error("Failed to extract text from PDF. The file may be corrupted or encrypted.");
   }
+
+  // Fallback: extract plaintext streams directly from PDF buffer
+  try {
+    const raw = buffer.toString("binary");
+    const textMatches: string[] = [];
+    const streamRegex = /stream[\r\n]+([\s\S]*?)[\r\n]+endstream/g;
+    let match;
+    const zlib = await import("zlib");
+
+    while ((match = streamRegex.exec(raw)) !== null) {
+      try {
+        const streamData = Buffer.from(match[1], "binary");
+        const decompressed = zlib.inflateSync(streamData).toString("utf-8");
+        const tjMatches = decompressed.match(/\((.*?)\)\s*Tj/g);
+        if (tjMatches) {
+          textMatches.push(
+            tjMatches.map((t) => t.replace(/^\(|\)\s*Tj$/g, "")).join(" ")
+          );
+        }
+      } catch {
+        // Continue scanning
+      }
+    }
+
+    if (textMatches.length > 0 && textMatches.join(" ").length > 30) {
+      return textMatches.join("\n\n");
+    }
+  } catch (fallbackErr) {
+    console.warn("Fallback stream extraction failed:", fallbackErr);
+  }
+
+  throw new Error("Failed to extract text from PDF. The file may be image-only, corrupted, or encrypted.");
 }
 
 /**
