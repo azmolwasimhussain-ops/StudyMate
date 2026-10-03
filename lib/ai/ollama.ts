@@ -1,14 +1,13 @@
-/**
- * Ollama AI Provider
- * Connects to local Ollama server running open-weight models (Gemma, Llama, Qwen, etc.)
- */
-
 import {
   AIProvider,
-  AIMessage,
   GenerateTextOptions,
   GenerateTextResult,
-} from "./provider";
+} from "@/types/ai";
+import {
+  DEFAULT_OLLAMA_BASE_URL,
+  DEFAULT_AI_MODEL,
+  AI_TIMEOUT_MS,
+} from "@/lib/constants/ai";
 
 export class OllamaProvider implements AIProvider {
   private baseUrl: string;
@@ -16,10 +15,8 @@ export class OllamaProvider implements AIProvider {
   private verifiedModel: string | null = null;
 
   constructor() {
-    this.baseUrl =
-      process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-    this.model =
-      process.env.AI_MODEL || "gemma2:2b";
+    this.baseUrl = process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL;
+    this.model = process.env.AI_MODEL || DEFAULT_AI_MODEL;
   }
 
   getModelName(): string {
@@ -29,7 +26,7 @@ export class OllamaProvider implements AIProvider {
   async getAvailableModels(): Promise<string[]> {
     try {
       const response = await fetch(`${this.baseUrl}/api/tags`, {
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(AI_TIMEOUT_MS.TAGS_FETCH),
       });
       if (!response.ok) return [];
       const data = await response.json();
@@ -44,23 +41,23 @@ export class OllamaProvider implements AIProvider {
     const available = await this.getAvailableModels();
     if (available.length === 0) return this.model;
 
-    // Check preferred configured model
     const exact = available.find(
-      (m) => m === this.model || m.startsWith(`${this.model}:`) || this.model.startsWith(m)
+      (m) =>
+        m === this.model ||
+        m.startsWith(`${this.model}:`) ||
+        this.model.startsWith(m)
     );
     if (exact) {
       this.verifiedModel = exact;
       return exact;
     }
 
-    // Prefer gemma if available
     const gemma = available.find((m) => m.toLowerCase().includes("gemma"));
     if (gemma) {
       this.verifiedModel = gemma;
       return gemma;
     }
 
-    // Otherwise use first available model
     this.verifiedModel = available[0];
     return available[0];
   }
@@ -68,7 +65,7 @@ export class OllamaProvider implements AIProvider {
   async isAvailable(): Promise<boolean> {
     try {
       const response = await fetch(`${this.baseUrl}/api/tags`, {
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(AI_TIMEOUT_MS.HEALTH_CHECK),
       });
       return response.ok;
     } catch {
@@ -92,7 +89,7 @@ export class OllamaProvider implements AIProvider {
           num_predict: options.maxTokens || 2048,
         },
       }),
-      signal: AbortSignal.timeout(120000), // 2 minute timeout for local inference
+      signal: AbortSignal.timeout(AI_TIMEOUT_MS.TEXT_GENERATION),
     });
 
     if (!response.ok) {
@@ -121,7 +118,7 @@ export class OllamaProvider implements AIProvider {
         model: activeModel,
         prompt: text,
       }),
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(AI_TIMEOUT_MS.EMBEDDING),
     });
 
     if (!response.ok) {

@@ -1,12 +1,4 @@
-/**
- * StudyMate Prompt Templates
- * All prompts are centralized here for consistency and easy tuning.
- */
-
 export const SYSTEM_PROMPTS = {
-  /**
-   * Base system prompt injected with all study chats
-   */
   studyBase: (materialTitle?: string) => `You are StudyMate, an expert AI study partner. ${
     materialTitle
       ? `You are helping a student study "${materialTitle}".`
@@ -20,18 +12,12 @@ Rules:
 - Structure your answers with clear headings and bullet points
 - Cite relevant parts of the material when possible`,
 
-  /**
-   * Simple explanation mode
-   */
   simple: `Explain like I'm encountering this topic for the first time. Use:
 - Simple, everyday language
 - Analogies and real-world examples
 - Short, clear sentences
 - Avoid technical jargon unless you explain it immediately`,
 
-  /**
-   * Detailed explanation mode
-   */
   detailed: `Give a thorough conceptual explanation. Include:
 - Core definition and concept
 - Underlying principles and theory
@@ -39,9 +25,6 @@ Rules:
 - Connections to related concepts
 - Common applications`,
 
-  /**
-   * Exam-ready mode
-   */
   examReady: `Give a structured exam-quality answer. Format it as:
 **Definition:** [clear definition]
 **Key Points:**
@@ -52,9 +35,6 @@ Rules:
 **Important for Exams:** [what examiners look for]`,
 };
 
-/**
- * Build a chat prompt with context and mode
- */
 export function buildChatPrompt({
   query,
   context,
@@ -91,9 +71,6 @@ ${query}`
   return { system, user };
 }
 
-/**
- * Quiz generation prompt
- */
 export function buildQuizPrompt({
   context,
   numQuestions,
@@ -148,9 +125,6 @@ Generate exactly ${numQuestions} questions.`;
   return { system, user };
 }
 
-/**
- * Study plan generation prompt
- */
 export function buildStudyPlanPrompt({
   goal,
   examDate,
@@ -204,9 +178,6 @@ Create tasks for all ${Math.min(daysUntilExam, 21)} days. Include review/revisio
   return { system, user };
 }
 
-/**
- * Revision generation prompt
- */
 export function buildRevisionPrompt({
   context,
   materialTitle,
@@ -232,7 +203,7 @@ ${context}
 Return a JSON object with this exact structure:
 {
   "summary": "2-3 sentence overview of the entire topic",
-  "keyConceptss": [
+  "keyConcepts": [
     {
       "concept": "Concept name",
       "definition": "Clear, concise definition",
@@ -261,9 +232,6 @@ Generate at least 5 keyConcepts, 8 flashcards, 3 commonMistakes, and 4 examTips.
   return { system, user };
 }
 
-/**
- * Weak topic analysis prompt
- */
 export function buildWeakTopicPrompt({
   quizResults,
 }: {
